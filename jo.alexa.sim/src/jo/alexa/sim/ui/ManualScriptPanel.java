@@ -63,8 +63,8 @@ public class ManualScriptPanel extends JPanel
         add("+,.", new JLabel("Select Test Cases:"));
         add("+,. ", mNumberOfTests);
         add("+,. ", mRandomize);
-        add("1,+ 4x1 weighty=1", new JScrollPane(mGenerate));
-        add("1,+ 4x1 fill=hv weighty=20", mScript);
+        add("1,+ 4x1 weighty=1", mGenerate);
+        add("1,+ 4x1 fill=hv weighty=20", new JScrollPane(mScript));
     }
 
     private void initLink()
