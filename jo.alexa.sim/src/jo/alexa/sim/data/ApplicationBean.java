@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ApplicationBean
+public class ApplicationBean extends PCSBean
 {
     // primary values
     private String              mEndpoint;
@@ -82,7 +82,9 @@ public class ApplicationBean
 
     public void setSessionID(String sessionID)
     {
+        String _sessionID = mSessionID;
         mSessionID = sessionID;
+        mPCS.firePropertyChange("sessionID", _sessionID, mSessionID);
     }
 
     public String getApplicationID()

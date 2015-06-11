@@ -18,6 +18,7 @@ public class MainPanel extends JPanel
  
     // tabs
     private ApplicationPanel    mApp;
+    private TestingPanel        mTester;
     private ManualScriptPanel   mManScript;
     
     public MainPanel(RuntimeBean runtime)
@@ -32,12 +33,14 @@ public class MainPanel extends JPanel
     {
         mApp = new ApplicationPanel(mRuntime);
         mManScript = new ManualScriptPanel(mRuntime);
+        mTester = new TestingPanel(mRuntime);
     }
 
     private void initLayout()
     {
         JTabbedPane tabs = new JTabbedPane();
         tabs.add("App", mApp);
+        tabs.add("Tester", mTester);
         tabs.add("Manual", mManScript);
         setLayout(new BorderLayout());
         add("Center", tabs);

@@ -1,13 +1,18 @@
 package jo.alexa.sim.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RuntimeBean extends PCSBean
 {
     private boolean         mDisclaimerAccepted;
     private ApplicationBean mApp;
+    private List<TransactionBean>   mHistory;
 
     public RuntimeBean()
     {
         mApp = new ApplicationBean();
+        mHistory = new ArrayList<TransactionBean>();
     }
     
     public ApplicationBean getApp()
@@ -32,5 +37,15 @@ public class RuntimeBean extends PCSBean
         boolean _disclaimerAccepted = mDisclaimerAccepted;
         mDisclaimerAccepted = disclaimerAccepted;
         mPCS.firePropertyChange("disclaimerAccepted", _disclaimerAccepted, mDisclaimerAccepted);
+    }
+
+    public List<TransactionBean> getHistory()
+    {
+        return mHistory;
+    }
+
+    public void setHistory(List<TransactionBean> history)
+    {
+        mHistory = history;
     }
 }
