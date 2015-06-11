@@ -15,6 +15,7 @@ public class ApplicationLogic
         app.getSlotIndex().clear();
         app.getIntentIndex().clear();
         app.setSchema(IntentSchemaLogic.read(rdr));
+        app.getUtterances().clear(); // these are now invalidated
         for (IntentBean intent : app.getSchema().getIntents())
         {
             app.getIntentIndex().put(intent.getIntent(), intent);

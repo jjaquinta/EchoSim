@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import jo.alexa.sim.data.IntentBean;
 import jo.alexa.sim.data.RuntimeBean;
@@ -242,6 +243,8 @@ public class ApplicationPanel extends JPanel
                     i.add(s);
                 }
             }
+        DefaultTreeModel m = (DefaultTreeModel)mIntents.getModel();
+        m.reload();
         mIntents.expandRow(0);
         mUtterances.setText("<html><body>"+UtteranceLogic.renderAsHTML(mRuntime.getApp().getUtterances())+"</body></html>");
     }

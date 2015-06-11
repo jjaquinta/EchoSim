@@ -32,7 +32,11 @@ public class UtteranceLogic
     {
         int o = inbuf.indexOf('\t');
         if (o < 0)
-            throw new IllegalArgumentException("Badly formed utterance line '"+inbuf+"'");
+        {
+            o = inbuf.indexOf(' ');
+            if (o < 0)
+                throw new IllegalArgumentException("Badly formed utterance line '"+inbuf+"'");
+        }
         UtteranceBean utterance = new UtteranceBean();
         utterance.setIntent(app.getIntentIndex().get(inbuf.substring(0, o)));
         if (utterance.getIntent() == null)

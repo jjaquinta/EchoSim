@@ -14,12 +14,22 @@ public class ApplicationBean
     // derived values
     private Map<String, IntentBean> mIntentIndex;
     private Map<String, SlotBean>   mSlotIndex;
+    private String              mSessionID;
+    private String              mApplicationID;
+    private String              mUserID;
+    private Map<String,Object>  mAttributes;
     
     public ApplicationBean()
     {
         mSlotIndex = new HashMap<String, SlotBean>();
         mIntentIndex = new HashMap<String, IntentBean>();
         mUtterances = new ArrayList<UtteranceBean>();
+        mSessionID = null;
+        mApplicationID = "yourFunkyApplication";
+        mUserID = System.getProperty("user.name");
+        mAttributes = new HashMap<String,Object>();
+        mAttributes.put("simulation", Boolean.TRUE);
+        mAttributes.put("simulator", "TsaTsaTzu EchoSim");
     }
     
     public String getEndpoint()
@@ -64,5 +74,44 @@ public class ApplicationBean
     {
         mIntentIndex = intentIndex;
     }
-    
+
+    public String getSessionID()
+    {
+        return mSessionID;
+    }
+
+    public void setSessionID(String sessionID)
+    {
+        mSessionID = sessionID;
+    }
+
+    public String getApplicationID()
+    {
+        return mApplicationID;
+    }
+
+    public void setApplicationID(String applicationID)
+    {
+        mApplicationID = applicationID;
+    }
+
+    public String getUserID()
+    {
+        return mUserID;
+    }
+
+    public void setUserID(String userID)
+    {
+        mUserID = userID;
+    }
+
+    public Map<String, Object> getAttributes()
+    {
+        return mAttributes;
+    }
+
+    public void setAttributes(Map<String, Object> attributes)
+    {
+        mAttributes = attributes;
+    }
 }
