@@ -1,5 +1,6 @@
 package jo.alexa.sim.data;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class MatchBean
@@ -7,6 +8,11 @@ public class MatchBean
     private double                  mConfidence;
     private IntentBean              mIntent;
     private Map<SlotBean, String>   mValues;
+    
+    public MatchBean()
+    {
+        mValues = new HashMap<SlotBean, String>();
+    }
     
     public double getConfidence()
     {

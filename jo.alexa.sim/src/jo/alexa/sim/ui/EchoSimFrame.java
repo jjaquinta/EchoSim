@@ -6,6 +6,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 
 import jo.alexa.sim.data.RuntimeBean;
+import jo.alexa.sim.logic.RuntimeLogic;
 
 public class EchoSimFrame extends JFrame
 {
@@ -28,7 +29,7 @@ public class EchoSimFrame extends JFrame
 
     private void initInstantiate()
     {
-        mRuntime = new RuntimeBean();
+        mRuntime = RuntimeLogic.newInstance();
         mClient = new EchoSimPanel(mRuntime);
     }
 

@@ -4,8 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -14,7 +17,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
+import jo.alexa.sim.data.MatchBean;
 import jo.alexa.sim.data.RuntimeBean;
+import jo.alexa.sim.logic.MatchLogic;
 import jo.alexa.sim.logic.RuntimeLogic;
 import jo.alexa.sim.logic.TransactionLogic;
 
@@ -30,6 +35,7 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     private JButton     mSend;
     private JButton     mStartSession;
     private JButton     mEndSession;
+    private JButton     mClear;
     private JTextField  mInput;
     private JTextPane   mTranscript;
     
@@ -46,6 +52,7 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     private void initInstantiate()
     {
         mSend = new JButton("Send");
+        mClear = new JButton("Clear");
         mStartSession = new JButton("|>");
         mEndSession = new JButton("[]");
         mInput = new JTextField(40);
@@ -65,10 +72,11 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
         bottom.add("Center", mInput);
         JPanel right = new JPanel();
         bottom.add("East", right);
-        right.setLayout(new GridLayout(1, 3));
+        right.setLayout(new GridLayout(1, 4));
         right.add(mSend);
         right.add(mStartSession);
         right.add(mEndSession);
+        right.add(mClear);
     }
 
     private void initLink()
@@ -78,6 +86,13 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
             public void actionPerformed(ActionEvent e)
             {
                 doSend();
+            }
+        });
+        mSend.addActionListener(new ActionListener() {            
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                doClear();
             }
         });
         mStartSession.addActionListener(new ActionListener() {            
@@ -94,6 +109,13 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
                 doEnd();
             }
         });
+        mInput.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                doInputUpdate();
+            }
+        });
         mRuntime.addPropertyChangeListener(this);
         mRuntime.getApp().addPropertyChangeListener(this);
     }
@@ -101,6 +123,12 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     private void doSend()
     {
         RuntimeLogic.send(mRuntime, mInput.getText());
+        mInput.setText("");
+    }
+
+    private void doClear()
+    {
+        RuntimeLogic.clearHistory(mRuntime);
     }
     
     private void doStart()
@@ -119,14 +147,26 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
         if (mRuntime.getApp().getSessionID() == null)
         {
             mStartSession.setEnabled(true);
-            mSend.setEnabled(false);
             mEndSession.setEnabled(false);
         }
         else
         {
             mStartSession.setEnabled(false);
-            mSend.setEnabled(true);
             mEndSession.setEnabled(true);
+        }
+        doInputUpdate();
+    }
+    
+    private void doInputUpdate()
+    {
+        if (mRuntime.getApp().getSessionID() == null)
+            mSend.setEnabled(false);
+        else
+        {
+            String txt = mInput.getText();
+            List<MatchBean> matches = MatchLogic.parseInput(mRuntime.getApp(), txt);
+            System.out.println("Matches="+matches.size());
+            mSend.setEnabled(matches.size() > 0);
         }
     }
     

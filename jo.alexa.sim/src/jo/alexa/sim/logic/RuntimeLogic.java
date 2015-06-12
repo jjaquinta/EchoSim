@@ -1,8 +1,12 @@
 package jo.alexa.sim.logic;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.List;
 import java.util.Properties;
 
@@ -14,6 +18,30 @@ import jo.alexa.sim.data.TransactionBean;
 
 public class RuntimeLogic
 {
+    private static Properties   mProps;
+
+    public static RuntimeBean newInstance()
+    {
+        RuntimeBean runtime = new RuntimeBean();
+        runtime.getApp().setEndpoint(getProp("app.endpoint"));
+        try
+        {
+            readIntents(runtime, new URI(getProp("app.intents")));
+        }
+        catch (Exception e)
+        {
+        }
+        try
+        {
+            readUtterances(runtime, new URI(getProp("app.utterances")));
+        }
+        catch (Exception e)
+        {
+        }
+        RequestLogic.disableCertificateValidation();
+        return runtime;
+    }
+    
     public static void acceptLicense(RuntimeBean runtime)
     {
         runtime.setDisclaimerAccepted(true);
@@ -26,20 +54,25 @@ public class RuntimeLogic
     {
         runtime.getApp().setEndpoint(endpoint);
         runtime.firePropertyChange("app", null, runtime.getApp());
+        setProp("app.endpoint", runtime.getApp().getEndpoint());
     }
-    public static void readIntents(RuntimeBean runtime, InputStream is) throws IOException
+    public static void readIntents(RuntimeBean runtime, URI source) throws IOException
     {
+        InputStream is = source.toURL().openStream();
         InputStreamReader rdr = new InputStreamReader(is);
         ApplicationLogic.readIntents(runtime.getApp(), rdr);
         rdr.close();
         runtime.firePropertyChange("app", null, runtime.getApp());
+        setProp("app.intents", source.toString());
     }
-    public static void readUtterances(RuntimeBean runtime, InputStream is) throws IOException
+    public static void readUtterances(RuntimeBean runtime, URI source) throws IOException
     {
+        InputStream is = source.toURL().openStream();
         InputStreamReader rdr = new InputStreamReader(is);
         UtteranceLogic.read(runtime.getApp(), rdr);
         rdr.close();
         runtime.firePropertyChange("app", null, runtime.getApp());
+        setProp("app.utterances", source.toString());
     }
     public static void send(RuntimeBean runtime, String text)
     {
@@ -101,12 +134,69 @@ public class RuntimeLogic
             trans.setTransactionEnd(System.currentTimeMillis());
             trans.setOutputData(response);
             trans.setOutputText(response.getOutputSpeechText());
+            runtime.getApp().setSessionID(null);
         }
         catch (IOException e)
         {
             trans.setError(e);
         }
         runtime.getHistory().add(trans);
+        runtime.firePropertyChange("history", null, runtime.getHistory());
+    }
+
+    public static void setProp(String key, String value)
+    {
+        loadProps();
+        mProps.setProperty(key, value);
+        saveProps();
+    }
+
+    public static String getProp(String key)
+    {
+        loadProps();
+        return mProps.getProperty(key);
+    }
+    
+    private static void loadProps()
+    {
+        if (mProps != null)
+            return;
+        mProps = new Properties();
+        File propFile = new File(System.getProperty("user.home"), ".echosim.properties");
+        if (!propFile.exists())
+            return;
+        try
+        {
+            FileInputStream fis = new FileInputStream(propFile);
+            mProps.load(fis);
+            fis.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private static void saveProps()
+    {
+        if (mProps == null)
+            return;
+        File propFile = new File(System.getProperty("user.home"), ".echosim.properties");
+        try
+        {
+            FileOutputStream fos = new FileOutputStream(propFile);
+            mProps.store(fos, "EchoSim Properties");
+            fos.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void clearHistory(RuntimeBean runtime)
+    {
+        runtime.getHistory().clear();
         runtime.firePropertyChange("history", null, runtime.getHistory());
     }
 }

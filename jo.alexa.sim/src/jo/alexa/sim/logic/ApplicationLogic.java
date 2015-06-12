@@ -8,8 +8,7 @@ import jo.alexa.sim.data.IntentBean;
 import jo.alexa.sim.data.SlotBean;
 
 public class ApplicationLogic
-{
-    
+{    
     public static void readIntents(ApplicationBean app, Reader rdr) throws IOException
     {
         app.getSlotIndex().clear();
@@ -22,6 +21,5 @@ public class ApplicationLogic
             for (SlotBean slot : intent.getSlots())
                 app.getSlotIndex().put(slot.getName(), slot);
         }
-    }
-
+    }    
 }

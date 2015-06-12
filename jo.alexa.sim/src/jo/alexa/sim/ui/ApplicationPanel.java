@@ -9,10 +9,9 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -152,9 +151,7 @@ public class ApplicationPanel extends JPanel
             return;
         try
         {
-            FileInputStream fis = new FileInputStream(intentFile);
-            RuntimeLogic.readIntents(mRuntime, fis);
-            fis.close();
+            RuntimeLogic.readIntents(mRuntime, (new File(intentFile)).toURI());
         }
         catch (IOException e)
         {
@@ -169,12 +166,9 @@ public class ApplicationPanel extends JPanel
             return;
         try
         {
-            URL u = new URL(intentURL);
-            InputStream is = u.openStream();
-            RuntimeLogic.readIntents(mRuntime, is);
-            is.close();
+            RuntimeLogic.readIntents(mRuntime, new URI(intentURL));
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Error reading "+intentURL, JOptionPane.ERROR_MESSAGE);
         }
@@ -191,9 +185,7 @@ public class ApplicationPanel extends JPanel
             return;
         try
         {
-            FileInputStream fis = new FileInputStream(intentFile);
-            RuntimeLogic.readUtterances(mRuntime, fis);
-            fis.close();
+            RuntimeLogic.readUtterances(mRuntime, (new File(intentFile)).toURI());
         }
         catch (IOException e)
         {
@@ -208,12 +200,9 @@ public class ApplicationPanel extends JPanel
             return;
         try
         {
-            URL u = new URL(intentURL);
-            InputStream is = u.openStream();
-            RuntimeLogic.readUtterances(mRuntime, is);
-            is.close();
+            RuntimeLogic.readUtterances(mRuntime, new URI(intentURL));
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Error reading "+intentURL, JOptionPane.ERROR_MESSAGE);
         }

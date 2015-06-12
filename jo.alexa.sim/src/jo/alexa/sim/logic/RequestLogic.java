@@ -5,10 +5,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import jo.alexa.sim.data.ApplicationBean;
 import jo.alexa.sim.data.ResponseBean;
@@ -20,6 +28,12 @@ import org.json.simple.parser.ParseException;
 public class RequestLogic
 {
     private static final JSONParser mParser = new JSONParser();
+    private static final DateFormat mISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    static
+    {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        mISO8601.setTimeZone(tz);
+    }
     
     private static String makeRequest(ApplicationBean app, String request) throws IOException
     {
@@ -52,7 +66,19 @@ public class RequestLogic
     private static ResponseBean makeRequest(ApplicationBean app, JSONObject requestObject) throws IOException
     {
         String requestString = makeRequestBody(app, requestObject).toJSONString();
-        String responseString = makeRequest(app, requestString);
+        System.out.println("Request: "+requestString);
+        String responseString = null;
+        try
+        {
+            responseString = makeRequest(app, requestString);
+        }
+        catch (IOException e)
+        {
+            app.setSessionID(null);
+            e.printStackTrace();
+            throw e;
+        }
+        System.out.println("Response: "+responseString);
         JSONObject responseObject;
         try
         {
@@ -69,30 +95,39 @@ public class RequestLogic
             for (String key : attributes.keySet())
                 app.getAttributes().put(key, attributes.get(key));
         JSONObject resp = (JSONObject)responseObject.get("response");
-        JSONObject outputSpeech = (JSONObject)resp.get("outputSpeech");
-        if (outputSpeech != null)
+        if (resp != null)
         {
-            response.setOutputSpeechType((String)outputSpeech.get("type"));
-            response.setOutputSpeechText((String)outputSpeech.get("text"));
-        }
-        JSONObject card = (JSONObject)resp.get("card");
-        if (card != null)
-        {
-            response.setCardType((String)card.get("type"));
-            response.setCardTitle((String)card.get("title"));
-            response.setCardContent((String)card.get("content"));
-        }
-        JSONObject reprompt = (JSONObject)resp.get("reprompt");
-        if (reprompt != null)
-        {
-            reprompt = (JSONObject)reprompt.get("outputSpeech");
+            JSONObject outputSpeech = (JSONObject)resp.get("outputSpeech");
+            if (outputSpeech != null)
+            {
+                response.setOutputSpeechType((String)outputSpeech.get("type"));
+                response.setOutputSpeechText((String)outputSpeech.get("text"));
+            }
+            JSONObject card = (JSONObject)resp.get("card");
+            if (card != null)
+            {
+                response.setCardType((String)card.get("type"));
+                response.setCardTitle((String)card.get("title"));
+                response.setCardContent((String)card.get("content"));
+            }
+            JSONObject reprompt = (JSONObject)resp.get("reprompt");
             if (reprompt != null)
             {
-                response.setRepromptType((String)reprompt.get("type"));
-                response.setRepromptText((String)reprompt.get("text"));
+                reprompt = (JSONObject)reprompt.get("outputSpeech");
+                if (reprompt != null)
+                {
+                    response.setRepromptType((String)reprompt.get("type"));
+                    response.setRepromptText((String)reprompt.get("text"));
+                }
             }
+            Boolean shouldEndSession = (Boolean)resp.get("shouldEndSession");
+            if (shouldEndSession != null)
+                response.setShouldEndSession(shouldEndSession);
+            else
+                response.setShouldEndSession(false);
+            if (response.isShouldEndSession())
+                app.setSessionID(null);
         }
-        response.setShouldEndSession(Boolean.parseBoolean(resp.get("shouldEndSession").toString()));
         return response;
     }
     
@@ -138,7 +173,7 @@ public class RequestLogic
         JSONObject request = new JSONObject();
         request.put("type", type);
         request.put("requestId", "req"+System.currentTimeMillis());
-        request.put("timestamp", (new Date()).toString());
+        request.put("timestamp", getNow());
         return request;
     }
     
@@ -187,5 +222,38 @@ public class RequestLogic
     public static ResponseBean performSessionEndedRequest(ApplicationBean app, String reason) throws IOException
     {
         return makeRequest(app, makeSessionEndedRequest(app, reason));
+    }
+    
+    private static String getNow()
+    {
+        String nowAsISO = mISO8601.format(new Date());
+        return nowAsISO;
+    }
+
+    public static void disableCertificateValidation()
+    {
+     // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[] { 
+            new X509TrustManager() {     
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() { 
+                    return new X509Certificate[0];
+                } 
+                public void checkClientTrusted( 
+                    java.security.cert.X509Certificate[] certs, String authType) {
+                    } 
+                public void checkServerTrusted( 
+                    java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            } 
+        }; 
+
+        // Install the all-trusting trust manager
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL"); 
+            sc.init(null, trustAllCerts, new java.security.SecureRandom()); 
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (GeneralSecurityException e) {
+        } 
+        // Now you can access an https URL without having the certificate in the truststore
     }
 }

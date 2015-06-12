@@ -10,13 +10,29 @@ public class TransactionLogic
     {
         StringBuffer html = new StringBuffer();
         html.append("<p>");
-        html.append("<span style=\"color: blue\">");
-        html.append(trans.getInputText());
-        html.append("</span>");
-        html.append("<br/>");
-        html.append("<span style=\"color: green\">");
-        html.append(trans.getOutputText());
-        html.append("</span>");
+        if (trans.getInputText() != null)
+        {
+            html.append("<span style=\"color: blue\">");
+            html.append(trans.getInputText());
+            html.append("</span>");
+            html.append("<br/>");
+        }
+        if (trans.getOutputText() != null)
+        {
+            html.append("<span style=\"color: green\">");
+            html.append(trans.getOutputText());
+            html.append("</span>");
+            html.append("<br/>");
+        }
+        if (trans.getError() != null)
+        {
+            html.append("<span style=\"color: red\">");           
+            html.append("<b>"+trans.getError().getLocalizedMessage()+"</b><br/>");
+            for (StackTraceElement elem : trans.getError().getStackTrace())
+                html.append("&nbsp;&nbsp;"+elem.toString()+"<br/>");
+            html.append("</span>");
+            html.append("<br/>");
+        }
         html.append("</p>");
         return html.toString();
     }
