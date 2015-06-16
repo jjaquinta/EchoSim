@@ -22,7 +22,7 @@ public class MatchBean
         {
             if (sb.length() > 0)
                 sb.append(", ");
-            sb.append(mValues.get(slot));
+            sb.append(slot.getName()+"="+mValues.get(slot));
         }
         if (sb.length() > 0)
             sb.insert(0, " - ");

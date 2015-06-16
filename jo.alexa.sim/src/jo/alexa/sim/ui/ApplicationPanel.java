@@ -225,7 +225,6 @@ public class ApplicationPanel extends JPanel
     
     private void doNewApplication()
     {
-        System.out.println("doNewApplication");
         if (mRuntime.getApp().getEndpoint() == null)
             mEndpoint.setText("");
         else
@@ -247,6 +246,5 @@ public class ApplicationPanel extends JPanel
         m.reload();
         mIntents.expandRow(0);
         mUtterances.setText("<html><body>"+UtteranceLogic.renderAsHTML(mRuntime.getApp().getUtterances())+"</body></html>");
-        System.out.println("doneNewApplication");
     }
 }

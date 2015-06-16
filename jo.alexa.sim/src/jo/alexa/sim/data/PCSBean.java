@@ -30,6 +30,8 @@ public class PCSBean
     public void firePropertyChange(String propertyName, Object oldValue,
             Object newValue)
     {
+        System.out.println("Firing "+propertyName);
         mPCS.firePropertyChange(propertyName, oldValue, newValue);
+        System.out.println("Fired "+propertyName);
     }
 }

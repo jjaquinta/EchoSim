@@ -52,9 +52,11 @@ public class RuntimeLogic
     }
     public static void setEndpoint(RuntimeBean runtime, String endpoint)
     {
+        System.out.println("Start new endpoint");
         runtime.getApp().setEndpoint(endpoint);
         runtime.firePropertyChange("app", null, runtime.getApp());
         setProp("app.endpoint", runtime.getApp().getEndpoint());
+        System.out.println("End new endpoint");
     }
     public static void readIntents(RuntimeBean runtime, URI source) throws IOException
     {

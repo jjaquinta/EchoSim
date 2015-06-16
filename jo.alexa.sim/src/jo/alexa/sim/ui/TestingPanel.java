@@ -1,7 +1,6 @@
 package jo.alexa.sim.ui;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -70,20 +69,16 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
         add("Center", new JScrollPane(mTranscript));
         JPanel inputBar = new JPanel();
         add("South", inputBar);
-        inputBar.setLayout(new BorderLayout());
-        inputBar.add("West", new JLabel("Say:"));
-        JPanel inputIntent = new JPanel();
-        inputIntent.setLayout(new BorderLayout());
-        inputIntent.add("North", mInput);
-        inputIntent.add("South", mIntent);
-        inputBar.add("Center", inputIntent);
-        JPanel right = new JPanel();
-        inputBar.add("East", right);
-        right.setLayout(new GridLayout(1, 4));
-        right.add(mSend);
-        right.add(mStartSession);
-        right.add(mEndSession);
-        right.add(mClear);
+        inputBar.setLayout(new TableLayout());
+        inputBar.add("1,1", new JLabel("Say:"));
+        inputBar.add("+,. fill=h", mInput);
+        inputBar.add("+,.", mSend);
+        inputBar.add("+,.", mStartSession);
+        inputBar.add("+,.", mEndSession);
+        inputBar.add("+,.", mClear);
+        inputBar.add("1,+", new JLabel(""));
+        inputBar.add("+,. fill=h", mIntent);
+        inputBar.add("+,. 4x1", new JLabel(""));
     }
 
     private void initLink()
@@ -118,9 +113,16 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
         });
         mInput.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e)
+            public void keyReleased(KeyEvent arg0)
             {
                 doInputUpdate();
+            }
+        });
+        mInput.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                doSend();
             }
         });
         mRuntime.addPropertyChangeListener(this);
@@ -131,6 +133,7 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     {
         RuntimeLogic.send(mRuntime, mInput.getText());
         mInput.setText("");
+        mInput.requestFocus();
     }
 
     private void doClear()
