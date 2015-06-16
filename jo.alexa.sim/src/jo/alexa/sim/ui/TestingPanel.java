@@ -52,12 +52,17 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     private void initInstantiate()
     {
         mSend = new JButton("Send");
+        mSend.setToolTipText("Send an IntentReqeust to the app");
         mClear = new JButton("Clear");
-        mStartSession = new JButton("|>");
-        mEndSession = new JButton("[]");
+        mClear.setToolTipText("Clear history");
+        mStartSession = new JButton("\u25b6");
+        mStartSession.setToolTipText("Send a LaunchReqeust to the app");
+        mEndSession = new JButton("\u25a0");
+        mEndSession.setToolTipText("Send a SessionEndedReqeust to the app");
         mInput = new JTextField(40);
         mIntent = new JTextField(40);
         mIntent.setEditable(false);
+        mIntent.setToolTipText("This is the intent your text will be translated into");
         mTranscript = new JTextPane();
         mTranscript.setContentType("text/html");
         mTranscript.setEditable(false);
