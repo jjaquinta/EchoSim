@@ -14,6 +14,22 @@ public class MatchBean
         mValues = new HashMap<SlotBean, String>();
     }
     
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        for (SlotBean slot : mValues.keySet())
+        {
+            if (sb.length() > 0)
+                sb.append(", ");
+            sb.append(mValues.get(slot));
+        }
+        if (sb.length() > 0)
+            sb.insert(0, " - ");
+        sb.insert(0, mIntent.getIntent());
+        return sb.toString();
+    }
+    
     public double getConfidence()
     {
         return mConfidence;

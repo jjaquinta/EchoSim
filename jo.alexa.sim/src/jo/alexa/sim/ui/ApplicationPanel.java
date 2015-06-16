@@ -143,15 +143,19 @@ public class ApplicationPanel extends JPanel
     protected void doIntentLoadFile()
     {
         FileDialog fd = new FileDialog(getFrame(), "Load Intent File", FileDialog.LOAD);
-        //fd.setDirectory(lastFile);
-        //fd.setFile(lastFile);
+        fd.setDirectory(RuntimeLogic.getProp("intent.file.dir"));
+        fd.setFile(RuntimeLogic.getProp("intent.file.dir"));
         fd.setVisible(true);
+        if (fd.getDirectory() == null)
+            return;
         String intentFile = fd.getDirectory()+System.getProperty("file.separator")+fd.getFile();
         if ((intentFile == null) || (intentFile.length() == 0))
             return;
         try
         {
             RuntimeLogic.readIntents(mRuntime, (new File(intentFile)).toURI());
+            RuntimeLogic.setProp("intent.file.dir", fd.getDirectory());
+            RuntimeLogic.setProp("intent.file.file", fd.getFile());
         }
         catch (IOException e)
         {
@@ -161,12 +165,13 @@ public class ApplicationPanel extends JPanel
 
     protected void doIntentLoadURL()
     {
-        String intentURL = JOptionPane.showInputDialog(this, "Enter in URL to Intent File", "Load Intent File", JOptionPane.QUESTION_MESSAGE);
+        String intentURL = JOptionPane.showInputDialog(this, "Enter in URL to Intent File", RuntimeLogic.getProp("intent.url"));
         if ((intentURL == null) || (intentURL.length() == 0))
             return;
         try
         {
             RuntimeLogic.readIntents(mRuntime, new URI(intentURL));
+            RuntimeLogic.setProp("intent.url", intentURL);
         }
         catch (Exception e)
         {
@@ -177,15 +182,19 @@ public class ApplicationPanel extends JPanel
     protected void doUtteranceLoadFile()
     {
         FileDialog fd = new FileDialog(getFrame(), "Load Utterance File", FileDialog.LOAD);
-        //fd.setDirectory(lastFile);
-        //fd.setFile(lastFile);
+        fd.setDirectory(RuntimeLogic.getProp("utterance.file.dir"));
+        fd.setFile(RuntimeLogic.getProp("utterance.file.dir"));
         fd.setVisible(true);
+        if (fd.getDirectory() == null)
+            return;
         String intentFile = fd.getDirectory()+System.getProperty("file.separator")+fd.getFile();
         if ((intentFile == null) || (intentFile.length() == 0))
             return;
         try
         {
             RuntimeLogic.readUtterances(mRuntime, (new File(intentFile)).toURI());
+            RuntimeLogic.setProp("utterance.file.dir", fd.getDirectory());
+            RuntimeLogic.setProp("utterance.file.file", fd.getFile());
         }
         catch (IOException e)
         {
@@ -195,12 +204,13 @@ public class ApplicationPanel extends JPanel
 
     protected void doUtteranceLoadURL()
     {
-        String intentURL = JOptionPane.showInputDialog(this, "Enter in URL to Utterance File", "Load Utterance File", JOptionPane.QUESTION_MESSAGE);
+        String intentURL = JOptionPane.showInputDialog(this, "Enter in URL to Utterance File", RuntimeLogic.getProp("utterance.url"));
         if ((intentURL == null) || (intentURL.length() == 0))
             return;
         try
         {
             RuntimeLogic.readUtterances(mRuntime, new URI(intentURL));
+            RuntimeLogic.setProp("utterance.url", intentURL);
         }
         catch (Exception e)
         {
@@ -215,6 +225,7 @@ public class ApplicationPanel extends JPanel
     
     private void doNewApplication()
     {
+        System.out.println("doNewApplication");
         if (mRuntime.getApp().getEndpoint() == null)
             mEndpoint.setText("");
         else
@@ -236,5 +247,6 @@ public class ApplicationPanel extends JPanel
         m.reload();
         mIntents.expandRow(0);
         mUtterances.setText("<html><body>"+UtteranceLogic.renderAsHTML(mRuntime.getApp().getUtterances())+"</body></html>");
+        System.out.println("doneNewApplication");
     }
 }

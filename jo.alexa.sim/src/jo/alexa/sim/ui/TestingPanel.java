@@ -38,6 +38,7 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     private JButton     mClear;
     private JTextField  mInput;
     private JTextPane   mTranscript;
+    private JTextField  mIntent;
     
     public TestingPanel(RuntimeBean runtime)
     {
@@ -56,6 +57,8 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
         mStartSession = new JButton("|>");
         mEndSession = new JButton("[]");
         mInput = new JTextField(40);
+        mIntent = new JTextField(40);
+        mIntent.setEditable(false);
         mTranscript = new JTextPane();
         mTranscript.setContentType("text/html");
         mTranscript.setEditable(false);
@@ -65,13 +68,17 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     {
         setLayout(new BorderLayout());
         add("Center", new JScrollPane(mTranscript));
-        JPanel bottom = new JPanel();
-        add("South", bottom);
-        bottom.setLayout(new BorderLayout());
-        bottom.add("West", new JLabel("Say:"));
-        bottom.add("Center", mInput);
+        JPanel inputBar = new JPanel();
+        add("South", inputBar);
+        inputBar.setLayout(new BorderLayout());
+        inputBar.add("West", new JLabel("Say:"));
+        JPanel inputIntent = new JPanel();
+        inputIntent.setLayout(new BorderLayout());
+        inputIntent.add("North", mInput);
+        inputIntent.add("South", mIntent);
+        inputBar.add("Center", inputIntent);
         JPanel right = new JPanel();
-        bottom.add("East", right);
+        inputBar.add("East", right);
         right.setLayout(new GridLayout(1, 4));
         right.add(mSend);
         right.add(mStartSession);
@@ -88,7 +95,7 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
                 doSend();
             }
         });
-        mSend.addActionListener(new ActionListener() {            
+        mClear.addActionListener(new ActionListener() {            
             @Override
             public void actionPerformed(ActionEvent e)
             {
@@ -159,15 +166,12 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     
     private void doInputUpdate()
     {
-        if (mRuntime.getApp().getSessionID() == null)
-            mSend.setEnabled(false);
+        String txt = mInput.getText();
+        List<MatchBean> matches = MatchLogic.parseInput(mRuntime.getApp(), txt);
+        if (matches.size() == 0)
+            mIntent.setText("");
         else
-        {
-            String txt = mInput.getText();
-            List<MatchBean> matches = MatchLogic.parseInput(mRuntime.getApp(), txt);
-            System.out.println("Matches="+matches.size());
-            mSend.setEnabled(matches.size() > 0);
-        }
+            mIntent.setText(matches.get(0).toString());
     }
     
     private void doNewHistory()

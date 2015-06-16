@@ -20,30 +20,80 @@ public class IntentSchemaLogic
     {
         try
         {
-            JSONObject intentSchema = (JSONObject)mParser.parse(rdr);
+            JSONObject intentSchema;
+            try
+            {
+                intentSchema = (JSONObject)mParser.parse(rdr);
+            }
+            catch (ClassCastException e)
+            {
+                throw new IOException("Expected primary JSON entity to be an object.");
+            }
             IntentSchemaBean is = new IntentSchemaBean();
-            JSONArray intents = (JSONArray)intentSchema.get("intents");
+            JSONArray intents;
+            try
+            {
+                intents = (JSONArray)intentSchema.get("intents");
+            }
+            catch (ClassCastException e)
+            {
+                throw new IOException("Expected intents JSON entity to be an array.");
+            }
             if (intents == null)
                 throw new IOException("No intents member of intent schema");
             for (Object intent : intents)
             {
                 IntentBean i = new IntentBean();
-                i.setIntent((String)((JSONObject)intent).get("intent"));
-                JSONArray slots = (JSONArray)(((JSONObject)intent).get("slots"));
+                JSONObject jIntent;
+                try
+                {
+                    jIntent = (JSONObject)intent;
+                }
+                catch (ClassCastException e)
+                {
+                    throw new IOException("Expected intent array JSON entity to be an object.");
+                }
+                try
+                {
+                    i.setIntent((String)jIntent.get("intent"));
+                }
+                catch (ClassCastException e)
+                {
+                    throw new IOException("Expected intent definition to be a string.");
+                }
+                JSONArray slots;
+                try
+                {
+                    slots = (JSONArray)(jIntent.get("slots"));
+                }
+                catch (ClassCastException e)
+                {
+                    throw new IOException("Expected slots JSON entity to be an array.");
+                }
                 for (Object slot : slots)
                 {
                     SlotBean s = new SlotBean();
-                    s.setName((String)((JSONObject)slot).get("name"));
-                    s.setType((String)((JSONObject)slot).get("type"));
+                    try
+                    {
+                        s.setName((String)((JSONObject)slot).get("name"));
+                    }
+                    catch (ClassCastException e)
+                    {
+                        throw new IOException("Expected name definition to be a string.");
+                    }
+                    try
+                    {
+                        s.setType((String)((JSONObject)slot).get("type"));
+                    }
+                    catch (ClassCastException e)
+                    {
+                        throw new IOException("Expected type definition to be a string.");
+                    }
                     i.getSlots().add(s);
                 }
                 is.getIntents().add(i);
             }
             return is;
-        }
-        catch (ClassCastException e)
-        {
-            throw new IOException("Bad json format", e);            
         }
         catch (ParseException e)
         {
