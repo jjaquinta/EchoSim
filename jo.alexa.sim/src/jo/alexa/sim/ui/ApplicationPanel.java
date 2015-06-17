@@ -2,6 +2,7 @@ package jo.alexa.sim.ui;
 
 import java.awt.Container;
 import java.awt.FileDialog;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,7 +16,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -29,6 +33,7 @@ import javax.swing.tree.DefaultTreeModel;
 import jo.alexa.sim.data.IntentBean;
 import jo.alexa.sim.data.SlotBean;
 import jo.alexa.sim.data.UtteranceBean;
+import jo.alexa.sim.ui.data.AppSpecBean;
 import jo.alexa.sim.ui.data.RuntimeBean;
 import jo.alexa.sim.ui.logic.RuntimeLogic;
 
@@ -49,6 +54,9 @@ public class ApplicationPanel extends JPanel
     private JButton     mUtteranceLoadFile;
     private JButton     mUtteranceLoadURL;
     private JList<String> mUtterances;
+    private JComboBox<AppSpecBean>  mMRUs;
+    private JButton                 mCopy;
+    private JButton                 mPaste;
     
     public ApplicationPanel(RuntimeBean runtime)
     {
@@ -57,6 +65,7 @@ public class ApplicationPanel extends JPanel
         initLayout();
         initLink();
         doNewApplication();
+        doNewMRUs();
     }
 
     private void initInstantiate()
@@ -69,12 +78,22 @@ public class ApplicationPanel extends JPanel
         mUtteranceLoadFile = new JButton("Load File...");
         mUtteranceLoadURL = new JButton("Load URL...");
         mUtterances = new JList<String>();
+        mMRUs = new JComboBox<AppSpecBean>();
+        mCopy = new JButton("Copy");
+        mPaste = new JButton("Paste");
     }
 
     private void initLayout()
     {
         setLayout(new TableLayout());
-        add("1,1", new JLabel("Endpoint:"));
+        add("1,1", new JLabel("Applications:"));
+        JPanel topBar = new JPanel();
+        add(".,+ 2x1 fill=h", topBar);
+        topBar.setLayout(new FlowLayout());
+        topBar.add(mMRUs);
+        topBar.add(mCopy);
+        topBar.add(mPaste);
+        add("1,+", new JLabel("Endpoint:"));
         add("+,. 2x1 fill=h", mEndpoint);
         add("1,+ anchor=nw", new JLabel("Intent Schema:"));
         add("+,.", mIntentLoadFile);
@@ -123,11 +142,39 @@ public class ApplicationPanel extends JPanel
                 doUtteranceLoadURL();
             }
         });
+        mCopy.addActionListener(new ActionListener() {            
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                doCopy();
+            }
+        });
+        mPaste.addActionListener(new ActionListener() {            
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                doPaste();
+            }
+        });
+        mMRUs.addActionListener(new ActionListener() {            
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                doMRU();
+            }
+        });
         mRuntime.addPropertyChangeListener("app", new PropertyChangeListener() {            
             @Override
             public void propertyChange(PropertyChangeEvent evt)
             {
                 doNewApplication();
+            }
+        });
+        mRuntime.addPropertyChangeListener("mrus", new PropertyChangeListener() {            
+            @Override
+            public void propertyChange(PropertyChangeEvent evt)
+            {
+                doNewMRUs();
             }
         });
     }
@@ -218,9 +265,58 @@ public class ApplicationPanel extends JPanel
         }
     }
 
+    private void doCopy()
+    {
+        RuntimeLogic.copySpec(mRuntime);
+    }
+
+    private void doPaste()
+    {
+        try
+        {
+            RuntimeLogic.pasteSpec(mRuntime);
+        }
+        catch (Exception e)
+        {
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Error during paste", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     private void doDeclareNewEndpoint()
     {
         RuntimeLogic.setEndpoint(mRuntime, mEndpoint.getText());
+    }
+
+    private void doMRU()
+    {
+        AppSpecBean spec = (AppSpecBean)mMRUs.getSelectedItem();
+        if ("$choose".equals(spec.getEndpoint()))
+            return;
+        if ("$add".equals(spec.getEndpoint()))
+        {
+            String name = JOptionPane.showInputDialog(this, "What do you want to name the preset?", "");
+            if ((name != null) && (name.length() > 0))
+                RuntimeLogic.addMRU(mRuntime, name);
+        }
+        else if ("$del".equals(spec.getEndpoint()))
+        {
+            AppSpecBean s = (AppSpecBean)JOptionPane.showInputDialog(this, "What preset to delete?", "Delete Preset", JOptionPane.QUESTION_MESSAGE, null,
+                   mRuntime.getMRUs().toArray(), null);
+            if (s != null)
+                RuntimeLogic.removeMRU(mRuntime, s);
+        }
+        else
+        {
+            try
+            {
+                RuntimeLogic.selectMRU(mRuntime, spec);
+            }
+            catch (Exception e)
+            {
+                JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Error during loading", JOptionPane.ERROR_MESSAGE);
+            }
+            mMRUs.setSelectedIndex(0);
+        }
     }
     
     private void doNewApplication()
@@ -250,5 +346,29 @@ public class ApplicationPanel extends JPanel
             data.add(u.toString());
         mUtterances.setListData(data.toArray(new String[0]));
         //mUtterances.setText("<html><body>"+UtteranceLogic.renderAsHTML(mRuntime.getApp().getUtterances())+"</body></html>");
+    }
+    
+    private void doNewMRUs()
+    {
+        List<AppSpecBean> mrus = new ArrayList<AppSpecBean>();
+        AppSpecBean choose = new AppSpecBean();
+        choose.setName("Choose preset applications");
+        choose.setEndpoint("$choose");
+        mrus.add(choose);
+        mrus.addAll(mRuntime.getMRUs());
+        AppSpecBean add = new AppSpecBean();
+        add.setName("Add current as preset");
+        add.setEndpoint("$add");
+        mrus.add(add);
+        if (mRuntime.getMRUs().size() > 0)
+        {
+            AppSpecBean del = new AppSpecBean();
+            del.setName("Delete a preset");
+            del.setEndpoint("$del");
+            mrus.add(del);
+        }
+        ComboBoxModel<AppSpecBean> aModel = new DefaultComboBoxModel<AppSpecBean>(mrus.toArray(new AppSpecBean[0]));         
+        mMRUs.setModel(aModel);
+        mMRUs.setSelectedIndex(0);
     }
 }

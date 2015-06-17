@@ -14,6 +14,7 @@ import jo.alexa.sim.data.ApplicationBean;
 import jo.alexa.sim.data.MatchBean;
 import jo.alexa.sim.data.ResponseBean;
 import jo.alexa.sim.data.SlotBean;
+import jo.alexa.sim.ui.data.AppSpecBean;
 import jo.alexa.sim.ui.data.TransactionBean;
 
 import org.json.simple.JSONArray;
@@ -21,6 +22,24 @@ import org.json.simple.JSONObject;
 
 public class FromJSONLogic
 {
+    public static List<AppSpecBean> fromJSONAppSpecs(JSONArray jspecs)
+    {
+        List<AppSpecBean> specs = new ArrayList<AppSpecBean>();
+        for (Object o : jspecs)
+            specs.add(fromJSONAppSpec((JSONObject)o));
+        return specs;
+    }
+    
+    public static AppSpecBean fromJSONAppSpec(JSONObject jspec)
+    {
+        AppSpecBean spec = new AppSpecBean();
+        spec.setName((String)jspec.get("Name"));
+        spec.setEndpoint((String)jspec.get("Endpoint"));
+        spec.setIntentURI((String)jspec.get("IntentURI"));
+        spec.setUtteranceURI((String)jspec.get("UtteranceURI"));
+        return spec;
+    }
+    
     public static List<TransactionBean> fromJSON(JSONArray jtranss, ApplicationBean context)
     {
         List<TransactionBean> transs = new ArrayList<TransactionBean>();

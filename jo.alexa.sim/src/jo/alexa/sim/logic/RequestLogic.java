@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
@@ -39,7 +40,7 @@ public class RequestLogic
     {
         byte[] body = request.getBytes("utf-8");
         URL serviceURL = new URL(app.getEndpoint());
-        HttpsURLConnection con = (HttpsURLConnection)serviceURL.openConnection();
+        HttpURLConnection con = (HttpURLConnection)serviceURL.openConnection();
         con.setDoOutput(true);
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json;charset=UTF-8");

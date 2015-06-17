@@ -1,5 +1,12 @@
 package jo.alexa.sim.ui.logic;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,6 +18,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -21,16 +30,25 @@ import jo.alexa.sim.logic.ApplicationLogic;
 import jo.alexa.sim.logic.MatchLogic;
 import jo.alexa.sim.logic.RequestLogic;
 import jo.alexa.sim.logic.UtteranceLogic;
+import jo.alexa.sim.ui.data.AppSpecBean;
 import jo.alexa.sim.ui.data.RuntimeBean;
 import jo.alexa.sim.ui.data.TransactionBean;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class RuntimeLogic
 {
+    private static final JSONParser mParser = new JSONParser();
     private static Properties   mProps;
+    private static ClipboardOwner mClipOwner = new ClipboardOwner() {        
+        @Override
+        public void lostOwnership(Clipboard clipboard, Transferable contents)
+        {
+        }
+    };
 
     public static RuntimeBean newInstance()
     {
@@ -64,6 +82,16 @@ public class RuntimeLogic
         catch (Exception e)
         {
         }
+        try
+        {
+            JSONArray jspecs = (JSONArray)mParser.parse(getProp("app.mrus"));
+            runtime.setMRUs(FromJSONLogic.fromJSONAppSpecs(jspecs));
+        }
+        catch (Exception e)
+        {            
+        }
+        if (runtime.getMRUs() == null)
+            runtime.setMRUs(new ArrayList<AppSpecBean>());
         RequestLogic.disableCertificateValidation();
         return runtime;
     }
@@ -78,11 +106,9 @@ public class RuntimeLogic
     }
     public static void setEndpoint(RuntimeBean runtime, String endpoint)
     {
-        System.out.println("Start new endpoint");
         runtime.getApp().setEndpoint(endpoint);
         runtime.firePropertyChange("app", null, runtime.getApp());
         setProp("app.endpoint", runtime.getApp().getEndpoint());
-        System.out.println("End new endpoint");
     }
     public static void readIntents(RuntimeBean runtime, URI source) throws IOException
     {
@@ -290,7 +316,7 @@ public class RuntimeLogic
         JSONArray jtranss;
         try
         {
-            jtranss = (JSONArray)((new JSONParser()).parse(rdr));
+            jtranss = (JSONArray)(mParser.parse(rdr));
         }
         catch (ParseException e)
         {
@@ -305,11 +331,71 @@ public class RuntimeLogic
 
     public static void saveHistory(RuntimeBean runtime, File source) throws IOException
     {
-        JSONArray transs = ToJSONLogic.toJSON(runtime.getHistory());
+        JSONArray transs = ToJSONLogic.toJSONTransactions(runtime.getHistory());
         OutputStream os = new FileOutputStream(source);
         Writer wtr = new OutputStreamWriter(os, "utf-8");
         wtr.write(transs.toJSONString());
         wtr.close();
         setProp("app.history", source.toString());
+    }
+    
+    private static void saveMRUs(RuntimeBean runtime)
+    {
+        JSONArray jspecs = ToJSONLogic.toJSONAppSpecs(runtime.getMRUs());
+        setProp("app.mrus", jspecs.toJSONString());
+    }
+    
+    public static void addMRU(RuntimeBean runtime, String name)
+    {
+        AppSpecBean spec = makeMRU(runtime, name);
+        runtime.getMRUs().add(spec);
+        runtime.firePropertyChange("mrus", null, runtime.getMRUs());
+        saveMRUs(runtime);
+    }
+    
+    public static void removeMRU(RuntimeBean runtime, AppSpecBean spec)
+    {
+        runtime.getMRUs().remove(spec);
+        runtime.firePropertyChange("mrus", null, runtime.getMRUs());
+        saveMRUs(runtime);
+    }
+    
+    public static void selectMRU(RuntimeBean runtime, AppSpecBean spec) throws IOException, URISyntaxException
+    {
+        setEndpoint(runtime, spec.getEndpoint());
+        readIntents(runtime, new URI(spec.getIntentURI()));
+        readUtterances(runtime, new URI(spec.getUtteranceURI()));
+    }
+
+    private static AppSpecBean makeMRU(RuntimeBean runtime, String name)
+    {
+        AppSpecBean spec = new AppSpecBean();
+        spec.setName(name);
+        spec.setEndpoint(runtime.getApp().getEndpoint());
+        spec.setIntentURI(getProp("app.intents"));
+        spec.setUtteranceURI(getProp("app.utterances"));
+        return spec;
+    }
+    
+    public static void copySpec(RuntimeBean runtime)
+    {
+        AppSpecBean spec = makeMRU(runtime, null);
+        JSONObject jspec = ToJSONLogic.toJSON(spec);
+        StringSelection ss = new StringSelection(jspec.toJSONString());
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(ss, mClipOwner);
+    }
+    
+    public static void pasteSpec(RuntimeBean runtime) throws IOException, URISyntaxException, UnsupportedFlavorException, ParseException
+    {
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable contents = clipboard.getContents(null);
+        if ((contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor))
+        {
+            String json = (String)contents.getTransferData(DataFlavor.stringFlavor);
+            JSONObject jspec = (JSONObject)mParser.parse(json);
+            AppSpecBean spec = FromJSONLogic.fromJSONAppSpec(jspec);
+            selectMRU(runtime, spec);
+        }
     }
 }

@@ -12,6 +12,7 @@ public class RuntimeBean extends PCSBean
     private ApplicationBean mApp;
     private List<TransactionBean>   mHistory;
     private TransactionRenderOpsBean    mRenderOps;
+    private List<AppSpecBean> mMRUs;
 
     public RuntimeBean()
     {
@@ -62,5 +63,15 @@ public class RuntimeBean extends PCSBean
     public void setRenderOps(TransactionRenderOpsBean renderOps)
     {
         mRenderOps = renderOps;
+    }
+
+    public List<AppSpecBean> getMRUs()
+    {
+        return mMRUs;
+    }
+
+    public void setMRUs(List<AppSpecBean> mRUs)
+    {
+        mMRUs = mRUs;
     }
 }

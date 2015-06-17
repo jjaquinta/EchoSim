@@ -10,6 +10,7 @@ import java.util.Map;
 import jo.alexa.sim.data.MatchBean;
 import jo.alexa.sim.data.ResponseBean;
 import jo.alexa.sim.data.SlotBean;
+import jo.alexa.sim.ui.data.AppSpecBean;
 import jo.alexa.sim.ui.data.TransactionBean;
 
 import org.json.simple.JSONArray;
@@ -18,7 +19,26 @@ import org.json.simple.JSONObject;
 public class ToJSONLogic
 {
     @SuppressWarnings("unchecked")
-    public static JSONArray toJSON(List<TransactionBean> transs)
+    public static JSONArray toJSONAppSpecs(List<AppSpecBean> specs)
+    {
+        JSONArray jspecs = new JSONArray();
+        for (AppSpecBean spec : specs)
+            jspecs.add(toJSON(spec));
+        return jspecs;
+    }
+    
+    public static JSONObject toJSON(AppSpecBean spec)
+    {
+        JSONObject jspec = new JSONObject();
+        jspec.put("Name", spec.getName());
+        jspec.put("Endpoint", spec.getEndpoint());
+        jspec.put("IntentURI", spec.getIntentURI());
+        jspec.put("UtteranceURI", spec.getUtteranceURI());
+        return jspec;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static JSONArray toJSONTransactions(List<TransactionBean> transs)
     {
         JSONArray jtranss = new JSONArray();
         for (TransactionBean trans : transs)

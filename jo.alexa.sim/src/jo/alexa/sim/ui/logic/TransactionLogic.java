@@ -67,12 +67,15 @@ public class TransactionLogic
         if (ops.isCards())
         {
             html.append("<td valign=\"top\" width=\"25%\">");
-            if (trans.getOutputData().getCardTitle() != null)
-                html.append("<b>"+trans.getOutputData().getCardTitle()+"</b><br/>");
-            if (trans.getOutputData().getCardContent() != null)
-                html.append("<i>"+trans.getOutputData().getCardContent()+"</i><br/>");
-            if (ops.isVerbose() && (trans.getOutputData().getCardType() != null))
-                html.append("<small>type="+trans.getOutputData().getCardType()+"</small><br/>");
+            if (trans.getOutputData() != null)
+            {
+                if (trans.getOutputData().getCardTitle() != null)
+                    html.append("<b>"+trans.getOutputData().getCardTitle()+"</b><br/>");
+                if (trans.getOutputData().getCardContent() != null)
+                    html.append("<i>"+trans.getOutputData().getCardContent()+"</i><br/>");
+                if (ops.isVerbose() && (trans.getOutputData().getCardType() != null))
+                    html.append("<small>type="+trans.getOutputData().getCardType()+"</small><br/>");
+            }
             html.append("</td>");
         }
         html.append("</tr>");
