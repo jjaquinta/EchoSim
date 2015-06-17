@@ -1,4 +1,7 @@
-package jo.alexa.sim.data;
+package jo.alexa.sim.ui.data;
+
+import jo.alexa.sim.data.MatchBean;
+import jo.alexa.sim.data.ResponseBean;
 
 public class TransactionBean
 {

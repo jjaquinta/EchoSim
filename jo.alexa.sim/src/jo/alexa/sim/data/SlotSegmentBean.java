@@ -5,6 +5,12 @@ public class SlotSegmentBean extends PhraseSegmentBean
     private String      mText;
     private SlotBean    mSlot;
     
+    @Override
+    public String toString()
+    {
+        return "{"+mText+"|"+mSlot.getName()+"}";
+    }
+    
     public String getText()
     {
         return mText;

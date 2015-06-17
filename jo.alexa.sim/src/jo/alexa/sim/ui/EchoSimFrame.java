@@ -5,8 +5,8 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-import jo.alexa.sim.data.RuntimeBean;
-import jo.alexa.sim.logic.RuntimeLogic;
+import jo.alexa.sim.ui.data.RuntimeBean;
+import jo.alexa.sim.ui.logic.RuntimeLogic;
 
 public class EchoSimFrame extends JFrame
 {

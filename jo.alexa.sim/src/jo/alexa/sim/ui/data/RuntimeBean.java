@@ -1,18 +1,23 @@
-package jo.alexa.sim.data;
+package jo.alexa.sim.ui.data;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import jo.alexa.sim.data.ApplicationBean;
+import jo.alexa.sim.data.PCSBean;
 
 public class RuntimeBean extends PCSBean
 {
     private boolean         mDisclaimerAccepted;
     private ApplicationBean mApp;
     private List<TransactionBean>   mHistory;
+    private TransactionRenderOpsBean    mRenderOps;
 
     public RuntimeBean()
     {
         mApp = new ApplicationBean();
         mHistory = new ArrayList<TransactionBean>();
+        mRenderOps = new TransactionRenderOpsBean();
     }
     
     public ApplicationBean getApp()
@@ -47,5 +52,15 @@ public class RuntimeBean extends PCSBean
     public void setHistory(List<TransactionBean> history)
     {
         mHistory = history;
+    }
+
+    public TransactionRenderOpsBean getRenderOps()
+    {
+        return mRenderOps;
+    }
+
+    public void setRenderOps(TransactionRenderOpsBean renderOps)
+    {
+        mRenderOps = renderOps;
     }
 }

@@ -5,7 +5,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import jo.alexa.sim.data.RuntimeBean;
+import jo.alexa.sim.ui.data.RuntimeBean;
 
 public class MainPanel extends JPanel
 {

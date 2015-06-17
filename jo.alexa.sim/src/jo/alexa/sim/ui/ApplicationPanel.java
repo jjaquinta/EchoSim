@@ -12,23 +12,25 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import jo.alexa.sim.data.IntentBean;
-import jo.alexa.sim.data.RuntimeBean;
 import jo.alexa.sim.data.SlotBean;
-import jo.alexa.sim.logic.RuntimeLogic;
-import jo.alexa.sim.logic.UtteranceLogic;
+import jo.alexa.sim.data.UtteranceBean;
+import jo.alexa.sim.ui.data.RuntimeBean;
+import jo.alexa.sim.ui.logic.RuntimeLogic;
 
 public class ApplicationPanel extends JPanel
 {
@@ -46,7 +48,7 @@ public class ApplicationPanel extends JPanel
     private JTree       mIntents;
     private JButton     mUtteranceLoadFile;
     private JButton     mUtteranceLoadURL;
-    private JTextPane   mUtterances;
+    private JList<String> mUtterances;
     
     public ApplicationPanel(RuntimeBean runtime)
     {
@@ -66,9 +68,7 @@ public class ApplicationPanel extends JPanel
         mIntents = new JTree(mRoot);
         mUtteranceLoadFile = new JButton("Load File...");
         mUtteranceLoadURL = new JButton("Load URL...");
-        mUtterances = new JTextPane();
-        mUtterances.setContentType("text/html");
-        mUtterances.setEditable(false);
+        mUtterances = new JList<String>();
     }
 
     private void initLayout()
@@ -144,7 +144,7 @@ public class ApplicationPanel extends JPanel
     {
         FileDialog fd = new FileDialog(getFrame(), "Load Intent File", FileDialog.LOAD);
         fd.setDirectory(RuntimeLogic.getProp("intent.file.dir"));
-        fd.setFile(RuntimeLogic.getProp("intent.file.dir"));
+        fd.setFile(RuntimeLogic.getProp("intent.file.file"));
         fd.setVisible(true);
         if (fd.getDirectory() == null)
             return;
@@ -183,7 +183,7 @@ public class ApplicationPanel extends JPanel
     {
         FileDialog fd = new FileDialog(getFrame(), "Load Utterance File", FileDialog.LOAD);
         fd.setDirectory(RuntimeLogic.getProp("utterance.file.dir"));
-        fd.setFile(RuntimeLogic.getProp("utterance.file.dir"));
+        fd.setFile(RuntimeLogic.getProp("utterance.file.file"));
         fd.setVisible(true);
         if (fd.getDirectory() == null)
             return;
@@ -245,6 +245,10 @@ public class ApplicationPanel extends JPanel
         DefaultTreeModel m = (DefaultTreeModel)mIntents.getModel();
         m.reload();
         mIntents.expandRow(0);
-        mUtterances.setText("<html><body>"+UtteranceLogic.renderAsHTML(mRuntime.getApp().getUtterances())+"</body></html>");
+        List<String> data = new ArrayList<String>();
+        for (UtteranceBean u : mRuntime.getApp().getUtterances())
+            data.add(u.toString());
+        mUtterances.setListData(data.toArray(new String[0]));
+        //mUtterances.setText("<html><body>"+UtteranceLogic.renderAsHTML(mRuntime.getApp().getUtterances())+"</body></html>");
     }
 }

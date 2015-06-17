@@ -15,8 +15,8 @@ import javax.swing.JTextPane;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
-import jo.alexa.sim.data.RuntimeBean;
 import jo.alexa.sim.logic.ManualScriptLogic;
+import jo.alexa.sim.ui.data.RuntimeBean;
 
 public class ManualScriptPanel extends JPanel
 {

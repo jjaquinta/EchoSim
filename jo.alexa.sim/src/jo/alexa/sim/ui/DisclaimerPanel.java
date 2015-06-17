@@ -9,8 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
-import jo.alexa.sim.data.RuntimeBean;
-import jo.alexa.sim.logic.RuntimeLogic;
+import jo.alexa.sim.ui.data.RuntimeBean;
+import jo.alexa.sim.ui.logic.RuntimeLogic;
 
 public class DisclaimerPanel extends JPanel
 {

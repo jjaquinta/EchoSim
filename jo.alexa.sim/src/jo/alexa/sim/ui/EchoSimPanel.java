@@ -7,7 +7,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JPanel;
 
-import jo.alexa.sim.data.RuntimeBean;
+import jo.alexa.sim.ui.data.RuntimeBean;
 
 public class EchoSimPanel extends JPanel
 {

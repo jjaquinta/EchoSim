@@ -29,6 +29,19 @@ public class UtteranceBean implements Comparable<UtteranceBean>
         return seg1.compareTo(seg2);
     }
     
+    @Override
+    public String toString()
+    {
+        StringBuffer txt = new StringBuffer(mIntent.getIntent());
+        txt.append(":");
+        for (PhraseSegmentBean p : mPhrase)
+        {
+            txt.append(" ");
+            txt.append(p.toString());
+        }
+        return txt.toString();
+    }
+    
     public IntentBean getIntent()
     {
         return mIntent;
