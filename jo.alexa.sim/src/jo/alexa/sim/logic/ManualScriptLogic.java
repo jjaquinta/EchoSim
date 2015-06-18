@@ -15,12 +15,14 @@ import jo.alexa.sim.data.PhraseSegmentBean;
 import jo.alexa.sim.data.SlotSegmentBean;
 import jo.alexa.sim.data.TextSegmentBean;
 import jo.alexa.sim.data.UtteranceBean;
+import jo.alexa.sim.ui.data.TransactionBean;
 
 public class ManualScriptLogic
 {
     private static final Random RND = new Random();
     
-    public static String generateScript(ApplicationBean app, int numTestCases, boolean randomizeOrder)
+    public static String generateScript(ApplicationBean app, int numTestCases, boolean randomizeOrder,
+            List<TransactionBean> history)
     {
         // validate args
         if (numTestCases < 1)
@@ -77,10 +79,49 @@ public class ManualScriptLogic
             html.append("</li>");
             html.append("<li>");
             html.append("Expect:");
+            TransactionBean expect = findExpected(utterance, history);
+            if (expect != null)
+                html.append(expect.getOutputText());
             html.append("</li>");
             html.append("</ul>");
         }
         return html.toString();
+    }
+
+    private static TransactionBean findExpected(UtteranceBean utterance,
+            List<TransactionBean> history)
+    {
+        if (history == null)
+            return null;
+        TransactionBean best = null;
+        for (TransactionBean hist : history)
+        {
+            if (hist.getInputMatch() == null)
+                continue; // open session
+            if (!hist.getInputMatch().getIntent().getIntent().equals(utterance.getIntent().getIntent()))
+                continue;
+            boolean match = true;
+            boolean perfectMatch = true;
+            for (PhraseSegmentBean seg : utterance.getPhrase())
+                if (seg instanceof SlotSegmentBean)
+                {
+                    SlotSegmentBean slotSeg = (SlotSegmentBean)seg;
+                    String histText = hist.getInputMatch().getValues().get(slotSeg.getSlot());
+                    if (histText == null)
+                    {
+                        match = false;
+                        break;
+                    }
+                    String slotText = slotSeg.getText();
+                    if (!histText.equals(slotText))
+                        perfectMatch = false;
+                }
+            if (perfectMatch)
+                return hist;
+            if (match)
+                best = hist;
+        }
+        return best;
     }
 
     private static List<UtteranceBean> randomize(Set<UtteranceBean> cases)

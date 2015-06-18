@@ -31,6 +31,7 @@ public class ManualScriptPanel extends JPanel
     private JCheckBox   mExhaustive;
     private JSpinner    mNumberOfTests;
     private JCheckBox   mRandomize;
+    private JCheckBox   mUseHistory;
     private JTextPane   mScript;
     
     public ManualScriptPanel(RuntimeBean runtime)
@@ -50,6 +51,8 @@ public class ManualScriptPanel extends JPanel
         mNumberOfTests = new JSpinner();
         mNumberOfTests.setEnabled(false);
         mRandomize = new JCheckBox("Randomize Order");
+        mUseHistory = new JCheckBox("Use History");
+        mUseHistory.setToolTipText("Use currently logged history to generate 'expected' results");
         mScript = new JTextPane();
         mScript.setContentType("text/html");
         mScript.setEditable(false);
@@ -58,13 +61,14 @@ public class ManualScriptPanel extends JPanel
     private void initLayout()
     {
         setLayout(new TableLayout());
-        add("1,1 4x1 anchor=nw weighty=1", new JLabel("Options:"));
+        add("1,1 5x1 anchor=nw weighty=1", new JLabel("Options:"));
         add("1,+  weighty=1", mExhaustive);
         add("+,.", new JLabel("Select Test Cases:"));
         add("+,. ", mNumberOfTests);
         add("+,. ", mRandomize);
-        add("1,+ 4x1 weighty=1", mGenerate);
-        add("1,+ 4x1 fill=hv weighty=20", new JScrollPane(mScript));
+        add("+,. ", mUseHistory);
+        add("1,+ 5x1 weighty=1", mGenerate);
+        add("1,+ 5x1 fill=hv weighty=20", new JScrollPane(mScript));
     }
 
     private void initLink()
@@ -101,7 +105,8 @@ public class ManualScriptPanel extends JPanel
     {
         String html = ManualScriptLogic.generateScript(mRuntime.getApp(), 
                 mExhaustive.isSelected() ? -1 : ((Number)mNumberOfTests.getValue()).intValue(), 
-                mRandomize.isSelected());
+                mRandomize.isSelected(),
+                mUseHistory.isSelected() ? mRuntime.getHistory() : null);
         mScript.setText("<html><body>"+html+"</body></html>");
     }
     
