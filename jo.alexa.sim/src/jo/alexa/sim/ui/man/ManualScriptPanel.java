@@ -1,4 +1,4 @@
-package jo.alexa.sim.ui;
+package jo.alexa.sim.ui.man;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +16,7 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
 import jo.alexa.sim.logic.ManualScriptLogic;
+import jo.alexa.sim.ui.TableLayout;
 import jo.alexa.sim.ui.data.RuntimeBean;
 
 public class ManualScriptPanel extends JPanel

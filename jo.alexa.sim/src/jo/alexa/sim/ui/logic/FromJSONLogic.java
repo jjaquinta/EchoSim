@@ -15,6 +15,7 @@ import jo.alexa.sim.data.MatchBean;
 import jo.alexa.sim.data.ResponseBean;
 import jo.alexa.sim.data.SlotBean;
 import jo.alexa.sim.ui.data.AppSpecBean;
+import jo.alexa.sim.ui.data.ScriptTransactionBean;
 import jo.alexa.sim.ui.data.TransactionBean;
 
 import org.json.simple.JSONArray;
@@ -40,16 +41,19 @@ public class FromJSONLogic
         return spec;
     }
     
-    public static List<TransactionBean> fromJSON(JSONArray jtranss, ApplicationBean context)
+    public static List<TransactionBean> fromJSONTransactions(JSONArray jtranss, ApplicationBean context)
     {
         List<TransactionBean> transs = new ArrayList<TransactionBean>();
         for (Object jtrans : jtranss)
-            transs.add(fromJSON(new TransactionBean(), (JSONObject)jtrans, context));
+            transs.add(fromJSONTransaction(new TransactionBean(), (JSONObject)jtrans, context));
         return transs;
     }
     
-    public static TransactionBean fromJSON(TransactionBean trans, JSONObject jtrans, ApplicationBean context)
+    public static TransactionBean fromJSONTransaction(TransactionBean trans, JSONObject jtrans, ApplicationBean context)
     {
+        if (jtrans == null)
+            return null;
+        trans.setRequestType((String)jtrans.get("RequestType"));
         trans.setInputText((String)jtrans.get("InputText"));
         trans.setOutputText((String)jtrans.get("OutputText"));
         trans.setTransactionStart(((Number)jtrans.get("TransactionStart")).longValue());
@@ -57,6 +61,22 @@ public class FromJSONLogic
         trans.setInputMatch(fromJSON((JSONObject)jtrans.get("InputMatch"), context));
         trans.setOutputData(fromJSON((JSONObject)jtrans.get("OutputData")));
         trans.setError((Throwable)fromJSON((String)jtrans.get("Error")));
+        return trans;
+    }
+    
+    public static List<ScriptTransactionBean> fromJSONScriptTransactions(JSONArray jtranss, ApplicationBean context)
+    {
+        List<ScriptTransactionBean> transs = new ArrayList<ScriptTransactionBean>();
+        for (Object jtrans : jtranss)
+            transs.add(fromJSONScriptTransaction(new ScriptTransactionBean(), (JSONObject)jtrans, context));
+        return transs;
+    }
+    
+    public static ScriptTransactionBean fromJSONScriptTransaction(ScriptTransactionBean trans, JSONObject jtrans, ApplicationBean context)
+    {
+        fromJSONTransaction(trans, jtrans, context);
+        trans.setExpectedResult((Boolean)jtrans.get("ExpectedResult"));
+        trans.setActualResult(fromJSONTransaction(new TransactionBean(), (JSONObject)jtrans.get("ActualResult"), context));
         return trans;
     }
     

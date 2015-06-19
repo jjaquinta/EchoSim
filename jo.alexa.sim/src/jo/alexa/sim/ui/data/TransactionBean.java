@@ -5,6 +5,7 @@ import jo.alexa.sim.data.ResponseBean;
 
 public class TransactionBean
 {
+    private String          mRequestType;
     private String          mInputText;
     private MatchBean       mInputMatch;
     private ResponseBean    mOutputData;
@@ -12,6 +13,22 @@ public class TransactionBean
     private long            mTransactionStart;
     private long            mTransactionEnd;
     private Throwable       mError;
+    
+    public TransactionBean()
+    {
+    }
+
+    public TransactionBean(TransactionBean trans)
+    {
+        mRequestType = trans.mRequestType;
+        mInputText = trans.mInputText;
+        mInputMatch = trans.mInputMatch;
+        mOutputData = trans.mOutputData;
+        mOutputText = trans.mOutputText;
+        mTransactionStart = trans.mTransactionStart;
+        mTransactionEnd = trans.mTransactionEnd;
+        mError = trans.mError;
+    }
     
     public String getInputText()
     {
@@ -68,5 +85,15 @@ public class TransactionBean
     public void setError(Throwable error)
     {
         mError = error;
+    }
+
+    public String getRequestType()
+    {
+        return mRequestType;
+    }
+
+    public void setRequestType(String requestType)
+    {
+        mRequestType = requestType;
     }
 }

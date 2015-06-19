@@ -11,6 +11,7 @@ import jo.alexa.sim.data.MatchBean;
 import jo.alexa.sim.data.ResponseBean;
 import jo.alexa.sim.data.SlotBean;
 import jo.alexa.sim.ui.data.AppSpecBean;
+import jo.alexa.sim.ui.data.ScriptTransactionBean;
 import jo.alexa.sim.ui.data.TransactionBean;
 
 import org.json.simple.JSONArray;
@@ -38,17 +39,37 @@ public class ToJSONLogic
     }
     
     @SuppressWarnings("unchecked")
+    public static JSONArray toJSONScriptTransactions(List<ScriptTransactionBean> transs)
+    {
+        JSONArray jtranss = new JSONArray();
+        for (ScriptTransactionBean trans : transs)
+            jtranss.add(toJSONScriptTransaction(trans));
+        return jtranss;
+    }
+    
+    public static JSONObject toJSONScriptTransaction(ScriptTransactionBean trans)
+    {
+        JSONObject jtrans = toJSONTransaction(trans);
+        jtrans.put("ExpectedResult", trans.isExpectedResult());
+        jtrans.put("ActualResult", toJSONTransaction(trans.getActualResult()));
+        return jtrans;
+    }
+    
+    @SuppressWarnings("unchecked")
     public static JSONArray toJSONTransactions(List<TransactionBean> transs)
     {
         JSONArray jtranss = new JSONArray();
         for (TransactionBean trans : transs)
-            jtranss.add(toJSON(trans));
+            jtranss.add(toJSONTransaction(trans));
         return jtranss;
     }
     
-    public static JSONObject toJSON(TransactionBean trans)
+    public static JSONObject toJSONTransaction(TransactionBean trans)
     {
+        if (trans == null)
+            return null;
         JSONObject jtrans = new JSONObject();
+        jtrans.put("RequestType", trans.getRequestType());
         jtrans.put("InputText", trans.getInputText());
         jtrans.put("OutputText", trans.getOutputText());
         jtrans.put("TransactionStart", trans.getTransactionStart());

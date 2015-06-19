@@ -28,6 +28,10 @@ import org.json.simple.parser.ParseException;
 
 public class RequestLogic
 {
+    public static final String LAUNCH_REQUEST = "LaunchRequest";
+    public static final String INTENT_REQUEST = "IntentRequest";
+    public static final String SESSION_ENDED_REQUEST = "SessionEndedRequest";
+
     private static final JSONParser mParser = new JSONParser();
     private static final DateFormat mISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     static
@@ -180,13 +184,13 @@ public class RequestLogic
     
     private static JSONObject makeLaunchRequest(ApplicationBean app)
     {
-        JSONObject launchRequest = makeBaseRequest("LaunchRequest");
+        JSONObject launchRequest = makeBaseRequest(LAUNCH_REQUEST);
         return launchRequest;
     }
     
     private static JSONObject makeIntentRequest(ApplicationBean app, String intentName, Properties slotValues)
     {
-        JSONObject intentRequest = makeBaseRequest("IntentRequest");
+        JSONObject intentRequest = makeBaseRequest(INTENT_REQUEST);
         JSONObject intent = new JSONObject();
         intent.put("name", intentName);
         JSONObject slots = new JSONObject();
@@ -205,7 +209,7 @@ public class RequestLogic
     
     private static JSONObject makeSessionEndedRequest(ApplicationBean app, String reason)
     {
-        JSONObject sessionEndedRequest = makeBaseRequest("SessionEndedRequest");
+        JSONObject sessionEndedRequest = makeBaseRequest(SESSION_ENDED_REQUEST);
         sessionEndedRequest.put("reason", reason);
         return sessionEndedRequest;
     }

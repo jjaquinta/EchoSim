@@ -41,7 +41,7 @@ import org.json.simple.parser.ParseException;
 
 public class RuntimeLogic
 {
-    private static final JSONParser mParser = new JSONParser();
+    static final JSONParser mParser = new JSONParser();
     private static Properties   mProps;
     private static ClipboardOwner mClipOwner = new ClipboardOwner() {        
         @Override
@@ -128,9 +128,10 @@ public class RuntimeLogic
         runtime.firePropertyChange("app", null, runtime.getApp());
         setProp("app.utterances", source.toString());
     }
-    public static void send(RuntimeBean runtime, String text)
+    public static TransactionBean send(RuntimeBean runtime, String text)
     {
         TransactionBean trans = new TransactionBean();
+        trans.setRequestType(RequestLogic.INTENT_REQUEST);
         trans.setInputText(text);
         List<MatchBean> matches =  MatchLogic.parseInput(runtime.getApp(), text);
         if (matches.size() == 0)
@@ -159,10 +160,12 @@ public class RuntimeLogic
         }
         runtime.getHistory().add(trans);
         runtime.firePropertyChange("history", null, runtime.getHistory());
+        return trans;
     }
-    public static void startSession(RuntimeBean runtime)
+    public static TransactionBean startSession(RuntimeBean runtime)
     {
         TransactionBean trans = new TransactionBean();
+        trans.setRequestType(RequestLogic.LAUNCH_REQUEST);
         try
         {
             trans.setTransactionStart(System.currentTimeMillis());
@@ -177,10 +180,12 @@ public class RuntimeLogic
         }
         runtime.getHistory().add(trans);
         runtime.firePropertyChange("history", null, runtime.getHistory());
+        return trans;
     }
-    public static void endSession(RuntimeBean runtime, String reason)
+    public static TransactionBean endSession(RuntimeBean runtime, String reason)
     {
         TransactionBean trans = new TransactionBean();
+        trans.setRequestType(RequestLogic.SESSION_ENDED_REQUEST);
         try
         {
             trans.setTransactionStart(System.currentTimeMillis());
@@ -196,6 +201,7 @@ public class RuntimeLogic
         }
         runtime.getHistory().add(trans);
         runtime.firePropertyChange("history", null, runtime.getHistory());
+        return trans;
     }
 
     public static void setProp(String key, String value)
@@ -323,7 +329,7 @@ public class RuntimeLogic
             throw new IOException(e);
         }
         rdr.close();
-        List<TransactionBean> transs = FromJSONLogic.fromJSON(jtranss, runtime.getApp());
+        List<TransactionBean> transs = FromJSONLogic.fromJSONTransactions(jtranss, runtime.getApp());
         runtime.setHistory(transs);
         runtime.firePropertyChange("history", null, runtime.getHistory());
         setProp("app.history", source.toString());

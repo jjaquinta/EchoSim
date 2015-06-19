@@ -3,6 +3,7 @@ package jo.alexa.sim.ui.logic;
 import java.util.Date;
 import java.util.List;
 
+import jo.alexa.sim.logic.RequestLogic;
 import jo.alexa.sim.ui.data.TransactionBean;
 import jo.alexa.sim.ui.data.TransactionRenderOpsBean;
 
@@ -19,7 +20,12 @@ public class TransactionLogic
         if (ops.isInputText() && trans.getInputText() != null)
         {
             html.append("<span style=\"color: blue\">");
-            html.append(trans.getInputText());
+            if ((trans.getRequestType() != null) && trans.getRequestType().equals(RequestLogic.LAUNCH_REQUEST))
+                html.append("&lt;launch session&gt;");
+            else if ((trans.getRequestType() != null) && trans.getRequestType().equals(RequestLogic.SESSION_ENDED_REQUEST))
+                html.append("&lt;session end&gt;");
+            else
+                html.append(trans.getInputText());
             html.append("</span>");
             html.append("<br/>");
         }

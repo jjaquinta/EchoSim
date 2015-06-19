@@ -1,4 +1,4 @@
-package jo.alexa.sim.ui;
+package jo.alexa.sim.ui.app;
 
 import java.awt.Container;
 import java.awt.FileDialog;
@@ -33,6 +33,7 @@ import javax.swing.tree.DefaultTreeModel;
 import jo.alexa.sim.data.IntentBean;
 import jo.alexa.sim.data.SlotBean;
 import jo.alexa.sim.data.UtteranceBean;
+import jo.alexa.sim.ui.TableLayout;
 import jo.alexa.sim.ui.data.AppSpecBean;
 import jo.alexa.sim.ui.data.RuntimeBean;
 import jo.alexa.sim.ui.logic.RuntimeLogic;

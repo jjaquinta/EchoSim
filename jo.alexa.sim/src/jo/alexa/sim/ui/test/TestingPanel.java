@@ -1,4 +1,4 @@
-package jo.alexa.sim.ui;
+package jo.alexa.sim.ui.test;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -26,6 +26,7 @@ import javax.swing.JTextPane;
 
 import jo.alexa.sim.data.MatchBean;
 import jo.alexa.sim.logic.MatchLogic;
+import jo.alexa.sim.ui.TableLayout;
 import jo.alexa.sim.ui.data.RuntimeBean;
 import jo.alexa.sim.ui.logic.RuntimeLogic;
 import jo.alexa.sim.ui.logic.TransactionLogic;
