@@ -82,10 +82,19 @@ public class MatchLogic
                     confidence += .5;
                     int start = 0;
                     int end = inbuf.length();
-                    if (i > 0)
+                    if ((i > 0) && (segments[i-1] != null))
                         start = segments[i-1][1];
+                    while ((start < end) && Character.isWhitespace(inbuf.charAt(start)))
+                        start++;
                     if (i + 1 < segments.length)
-                        end = segments[i+1][0];
+                        if (segments[i+1] != null)
+                            end = segments[i+1][0];
+                        else
+                        {
+                            int sp = inbuf.indexOf(' ', start);
+                            if (sp > start)
+                                end = sp;
+                        }
                     segments[i] = new int[] { start, end };
                 }
                 match.getValues().put(slotSeg.getSlot(), inbuf.substring(segments[i][0], segments[i][1]).trim());
