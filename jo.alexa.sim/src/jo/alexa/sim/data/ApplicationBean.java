@@ -94,7 +94,9 @@ public class ApplicationBean extends PCSBean
 
     public void setApplicationID(String applicationID)
     {
+        String _old = mApplicationID;
         mApplicationID = applicationID;
+        mPCS.firePropertyChange("sessionID", _old, mApplicationID);
     }
 
     public String getUserID()
@@ -104,7 +106,9 @@ public class ApplicationBean extends PCSBean
 
     public void setUserID(String userID)
     {
+        String _old = mUserID;
         mUserID = userID;
+        mPCS.firePropertyChange("sessionID", _old, mUserID);
     }
 
     public Map<String, Object> getAttributes()

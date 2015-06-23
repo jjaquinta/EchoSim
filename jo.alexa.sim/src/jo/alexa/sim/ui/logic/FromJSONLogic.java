@@ -36,6 +36,8 @@ public class FromJSONLogic
         AppSpecBean spec = new AppSpecBean();
         spec.setName((String)jspec.get("Name"));
         spec.setEndpoint((String)jspec.get("Endpoint"));
+        spec.setUserID((String)jspec.get("UserID"));
+        spec.setApplicationID((String)jspec.get("ApplicationID"));
         spec.setIntentURI((String)jspec.get("IntentURI"));
         spec.setUtteranceURI((String)jspec.get("UtteranceURI"));
         return spec;

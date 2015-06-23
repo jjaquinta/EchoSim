@@ -49,6 +49,8 @@ public class ApplicationPanel extends JPanel
     private DefaultMutableTreeNode  mRoot;
     
     private JTextField  mEndpoint;
+    private JTextField  mApplicationID;
+    private JTextField  mUserID;
     private JButton     mIntentLoadFile;
     private JButton     mIntentLoadURL;
     private JTree       mIntents;
@@ -72,6 +74,8 @@ public class ApplicationPanel extends JPanel
     private void initInstantiate()
     {
         mEndpoint = new JTextField(40);
+        mApplicationID = new JTextField(40);
+        mUserID = new JTextField(40);
         mIntentLoadFile = new JButton("Load File...");
         mIntentLoadURL = new JButton("Load URL...");
         mRoot = new DefaultMutableTreeNode("Intents");
@@ -96,6 +100,10 @@ public class ApplicationPanel extends JPanel
         topBar.add(mPaste);
         add("1,+", new JLabel("Endpoint:"));
         add("+,. 2x1 fill=h", mEndpoint);
+        add("1,+", new JLabel("Application ID:"));
+        add("+,. 2x1 fill=h", mApplicationID);
+        add("1,+", new JLabel("User ID:"));
+        add("+,. 2x1 fill=h", mUserID);
         add("1,+ anchor=nw", new JLabel("Intent Schema:"));
         add("+,.", mIntentLoadFile);
         add("+,.", mIntentLoadURL);
@@ -113,6 +121,20 @@ public class ApplicationPanel extends JPanel
             public void focusLost(FocusEvent e)
             {
                 doDeclareNewEndpoint();
+            }
+        });
+        mUserID.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                doDeclareNewUserID();
+            }
+        });
+        mApplicationID.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                doDeclareNewApplicationID();
             }
         });
         mIntentLoadFile.addActionListener(new ActionListener() {            
@@ -287,6 +309,16 @@ public class ApplicationPanel extends JPanel
     {
         RuntimeLogic.setEndpoint(mRuntime, mEndpoint.getText());
     }
+    
+    private void doDeclareNewApplicationID()
+    {
+        RuntimeLogic.setApplicationID(mRuntime, mApplicationID.getText());
+    }
+    
+    private void doDeclareNewUserID()
+    {
+        RuntimeLogic.setUserID(mRuntime, mUserID.getText());
+    }
 
     private void doMRU()
     {
@@ -327,6 +359,16 @@ public class ApplicationPanel extends JPanel
         else
             if (!mRuntime.getApp().getEndpoint().equals(mEndpoint.getText()))
                 mEndpoint.setText(mRuntime.getApp().getEndpoint());
+        if (mRuntime.getApp().getApplicationID() == null)
+            mApplicationID.setText("");
+        else
+            if (!mRuntime.getApp().getApplicationID().equals(mApplicationID.getText()))
+                mApplicationID.setText(mRuntime.getApp().getApplicationID());
+        if (mRuntime.getApp().getUserID() == null)
+            mUserID.setText("");
+        else
+            if (!mRuntime.getApp().getUserID().equals(mUserID.getText()))
+                mUserID.setText(mRuntime.getApp().getUserID());
         mRoot.removeAllChildren();
         if (mRuntime.getApp().getSchema() != null)
             for (IntentBean intent : mRuntime.getApp().getSchema().getIntents())

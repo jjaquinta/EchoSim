@@ -4,6 +4,8 @@ public class AppSpecBean
 {
     private String  mName;
     private String  mEndpoint;
+    private String  mApplicationID;
+    private String  mUserID;
     private String  mIntentURI;
     private String  mUtteranceURI;
     
@@ -44,5 +46,25 @@ public class AppSpecBean
     public void setUtteranceURI(String utteranceURI)
     {
         mUtteranceURI = utteranceURI;
+    }
+
+    public String getApplicationID()
+    {
+        return mApplicationID;
+    }
+
+    public void setApplicationID(String applicationID)
+    {
+        mApplicationID = applicationID;
+    }
+
+    public String getUserID()
+    {
+        return mUserID;
+    }
+
+    public void setUserID(String userID)
+    {
+        mUserID = userID;
     }
 }

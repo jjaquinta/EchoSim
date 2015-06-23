@@ -33,6 +33,8 @@ public class ToJSONLogic
         JSONObject jspec = new JSONObject();
         jspec.put("Name", spec.getName());
         jspec.put("Endpoint", spec.getEndpoint());
+        jspec.put("ApplicationID", spec.getApplicationID());
+        jspec.put("UserID", spec.getUserID());
         jspec.put("IntentURI", spec.getIntentURI());
         jspec.put("UtteranceURI", spec.getUtteranceURI());
         return jspec;

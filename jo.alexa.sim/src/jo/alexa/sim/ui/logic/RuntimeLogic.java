@@ -110,6 +110,18 @@ public class RuntimeLogic
         runtime.firePropertyChange("app", null, runtime.getApp());
         setProp("app.endpoint", runtime.getApp().getEndpoint());
     }
+    public static void setApplicationID(RuntimeBean runtime, String applicationID)
+    {
+        runtime.getApp().setApplicationID(applicationID);
+        runtime.firePropertyChange("app", null, runtime.getApp());
+        setProp("app.applicationID", runtime.getApp().getApplicationID());
+    }
+    public static void setUserID(RuntimeBean runtime, String UserID)
+    {
+        runtime.getApp().setUserID(UserID);
+        runtime.firePropertyChange("app", null, runtime.getApp());
+        setProp("app.endpoint", runtime.getApp().getUserID());
+    }
     public static void readIntents(RuntimeBean runtime, URI source) throws IOException
     {
         InputStream is = source.toURL().openStream();
@@ -369,6 +381,8 @@ public class RuntimeLogic
     public static void selectMRU(RuntimeBean runtime, AppSpecBean spec) throws IOException, URISyntaxException
     {
         setEndpoint(runtime, spec.getEndpoint());
+        setApplicationID(runtime, spec.getApplicationID());
+        setUserID(runtime, spec.getUserID());
         readIntents(runtime, new URI(spec.getIntentURI()));
         readUtterances(runtime, new URI(spec.getUtteranceURI()));
     }
@@ -378,6 +392,8 @@ public class RuntimeLogic
         AppSpecBean spec = new AppSpecBean();
         spec.setName(name);
         spec.setEndpoint(runtime.getApp().getEndpoint());
+        spec.setApplicationID(runtime.getApp().getApplicationID());
+        spec.setUserID(runtime.getApp().getUserID());
         spec.setIntentURI(getProp("app.intents"));
         spec.setUtteranceURI(getProp("app.utterances"));
         return spec;
