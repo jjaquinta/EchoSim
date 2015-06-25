@@ -54,7 +54,7 @@ public class UtteranceLogic
                 if (mid < 0)
                     throw new IllegalArgumentException("Can't find middle of slot '"+slotPhrase+"'");
                 SlotSegmentBean slotSeg = new SlotSegmentBean();
-                slotSeg.setText(slotPhrase.substring(0, mid));
+                slotSeg.setText(slotPhrase.substring(0, mid).toLowerCase());
                 slotSeg.setSlot(app.getSlotIndex().get(slotPhrase.substring(mid + 1)));
                 if (slotSeg.getSlot() == null)
                     throw new IllegalArgumentException("Unknown slot '"+slotPhrase.substring(mid + 1)+"'");
@@ -66,7 +66,7 @@ public class UtteranceLogic
                 if (end < 0)
                     end = inbuf.length();
                 TextSegmentBean textSeg = new TextSegmentBean();
-                textSeg.setText(inbuf.substring(0, end).trim());
+                textSeg.setText(inbuf.substring(0, end).trim().toLowerCase());
                 inbuf = inbuf.substring(end).trim();
                 utterance.getPhrase().add(textSeg);
             }

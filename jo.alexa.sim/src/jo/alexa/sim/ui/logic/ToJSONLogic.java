@@ -126,7 +126,8 @@ public class ToJSONLogic
             return null;
         JSONObject jmatch = new JSONObject();
         jmatch.put("Confidence", match.getConfidence());
-        jmatch.put("Intent", match.getIntent().getIntent());
+        if (match.getIntent() != null)
+            jmatch.put("Intent", match.getIntent().getIntent());
         jmatch.put("Values", toJSON(match.getValues()));
         return jmatch;
     }
