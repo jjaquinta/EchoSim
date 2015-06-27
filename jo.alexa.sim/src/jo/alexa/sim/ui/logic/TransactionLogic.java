@@ -43,7 +43,7 @@ public class TransactionLogic
             html.append("</span>");
             html.append("<br/>");
         }
-        if (ops.isReprompt() && trans.getOutputData().getRepromptText() != null)
+        if (ops.isReprompt() && trans.getOutputData() != null && trans.getOutputData().getRepromptText() != null)
         {
             html.append("<span style=\"color: darkgreen\">");
             html.append(trans.getOutputData().getRepromptText());
