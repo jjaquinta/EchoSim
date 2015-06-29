@@ -243,7 +243,7 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     private void doSend()
     {
         RuntimeLogic.send(mRuntime, mInput.getText());
-        mInput.setText("");
+        mInput.selectAll();
         mInput.requestFocus();
     }
 
