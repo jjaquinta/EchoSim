@@ -17,6 +17,8 @@ public class MatchBean
     @Override
     public String toString()
     {
+        if (mIntent == null)
+            return "";
         StringBuffer sb = new StringBuffer();
         for (SlotBean slot : mValues.keySet())
         {

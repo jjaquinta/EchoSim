@@ -26,6 +26,11 @@ public class PCSBean
     {
         mPCS.removePropertyChangeListener(listener);
     }
+    
+    public void removePropertyChangeListener(String property, PropertyChangeListener listener)
+    {
+        mPCS.removePropertyChangeListener(property, listener);
+    }
 
     public void firePropertyChange(String propertyName, Object oldValue,
             Object newValue)

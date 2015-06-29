@@ -18,18 +18,18 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 
 import jo.alexa.sim.data.MatchBean;
 import jo.alexa.sim.logic.MatchLogic;
 import jo.alexa.sim.ui.TableLayout;
 import jo.alexa.sim.ui.data.RuntimeBean;
+import jo.alexa.sim.ui.data.TransactionBean;
 import jo.alexa.sim.ui.logic.RuntimeLogic;
-import jo.alexa.sim.ui.logic.TransactionLogic;
 
 public class TestingPanel extends JPanel implements PropertyChangeListener
 {
@@ -54,7 +54,7 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     private JButton     mSave;
     private JButton     mLoad;
     private JTextField  mInput;
-    private JTextPane   mTranscript;
+    private JList<TransactionBean> mTranscript;
     private JTextField  mIntent;
     
     public TestingPanel(RuntimeBean runtime)
@@ -93,9 +93,8 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
         mIntent = new JTextField(40);
         mIntent.setEditable(false);
         mIntent.setToolTipText("This is the intent your text will be translated into");
-        mTranscript = new JTextPane();
-        mTranscript.setContentType("text/html");
-        mTranscript.setEditable(false);
+        mTranscript = new JList<TransactionBean>(new HistoryModel(mRuntime));
+        mTranscript.setCellRenderer(new HistoryCellRenderer(mRuntime));
     }
 
     private void initLayout()
@@ -347,8 +346,8 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     
     private void doNewHistory()
     {
-        String html = "<html><body>" + TransactionLogic.renderAsHTML(mRuntime.getHistory(), mRuntime.getRenderOps()) + "</body></html>";
-        mTranscript.setText(html);
+        //String html = "<html><body>" + TransactionLogic.renderAsHTML(mRuntime.getHistory(), mRuntime.getRenderOps()) + "</body></html>";
+        //mTranscript.setText(html);
     }
     
     @Override
