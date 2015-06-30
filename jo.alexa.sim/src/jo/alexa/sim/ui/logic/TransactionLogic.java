@@ -14,7 +14,7 @@ public class TransactionLogic
         StringBuffer html = new StringBuffer();
         html.append("<tr>");
         if (ops.isCards())
-            html.append("<td valign=\"top\" width=\"75%\">");
+            html.append("<td valign=\"top\" width=\"50%\">");
         else
             html.append("<td>");
         if (ops.isInputText() && trans.getInputText() != null)
@@ -72,7 +72,8 @@ public class TransactionLogic
         html.append("</td>");
         if (ops.isCards())
         {
-            html.append("<td valign=\"top\" width=\"25%\">");
+            html.append("<td valign=\"top\" width=\"50%\">");
+            html.append("<table width=\"100%\" border=\"1\"><tr><td>");
             if (trans.getOutputData() != null)
             {
                 if (trans.getOutputData().getCardTitle() != null)
@@ -82,6 +83,7 @@ public class TransactionLogic
                 if (ops.isVerbose() && (trans.getOutputData().getCardType() != null))
                     html.append("<small>type="+trans.getOutputData().getCardType()+"</small><br/>");
             }
+            html.append("</td></tr></table>");
             html.append("</td>");
         }
         html.append("</tr>");

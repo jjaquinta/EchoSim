@@ -7,8 +7,12 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -23,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 
 import jo.alexa.sim.data.MatchBean;
 import jo.alexa.sim.logic.MatchLogic;
@@ -100,7 +105,9 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
     private void initLayout()
     {
         setLayout(new BorderLayout());
-        add("Center", new JScrollPane(mTranscript));
+        add("Center", new JScrollPane(mTranscript,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
         JPanel inputBar = new JPanel();
         add("South", inputBar);
         inputBar.setLayout(new TableLayout());
@@ -235,8 +242,28 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
                 doLoad();
             }
         });
+        mTranscript.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent ev)
+            {
+                if (ev.getClickCount() == 2)
+                {
+                    TransactionBean trans = mTranscript.getSelectedValue();
+                    if ((trans != null) && (trans.getInputText() != null))
+                        mInput.setText(trans.getInputText());
+                }
+            }
+        });
         mRuntime.addPropertyChangeListener(this);
         mRuntime.getApp().addPropertyChangeListener(this);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent ev)
+            {
+                mTranscript.setFixedCellWidth(TestingPanel.this.getWidth());
+                mTranscript.setFixedCellHeight(-1);
+            }
+        });
     }
 
     private void doSend()
@@ -361,6 +388,7 @@ public class TestingPanel extends JPanel implements PropertyChangeListener
         {
             doNewOpts();
             doNewHistory();
+            mTranscript.repaint();
         }
     }
     
