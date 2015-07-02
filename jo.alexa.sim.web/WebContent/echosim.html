@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Echo Simulator</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<script type="text/javascript" src="echosim.js"></script>
+<h1>Amazon Echo Simulator</h1>
+Say:&nbsp;<input type="text" id="text" onkeydown="if (event.keyCode == 13) doTalk();"/>&nbsp;<input type="button" value="&#x25b6;" onClick="doTalk();"/>
+<hr/>
+<span id="message"></span>
+</body>
+</html>

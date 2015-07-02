@@ -1,0 +1,8 @@
+applications:
+- disk_quota: 1024M
+  host: echobluemixtest
+  name: EchoBluemixTest
+  path: webStarterApp.war
+  domain: mybluemix.net
+  instances: 1
+  memory: 512M
