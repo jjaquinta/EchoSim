@@ -1,9 +1,12 @@
 package jo.alexa.sim.logic;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -41,6 +44,43 @@ public class RequestLogic
     }
     
     private static String makeRequest(ApplicationBean app, String request) throws IOException
+    {
+        if (app.getEndpoint().contains("://"))
+            return makeHTTPRequest(app, request);
+        else if (app.getEndpoint().contains("::"))
+            return makeFunctionRequest(app, request);
+        else
+            throw new IllegalArgumentException("Unknown endpoint "+app.getEndpoint());
+                
+    }
+    
+    private static String makeFunctionRequest(ApplicationBean app, String request) throws IOException
+    {
+        try
+        {
+            int o = app.getEndpoint().indexOf("::");
+            String className = app.getEndpoint().substring(0, o);
+            String methodName = app.getEndpoint().substring(o + 2);
+            Class<?> functionClass = Class.forName(className);
+            Class<?> contextClass = Class.forName("com.amazonaws.services.lambda.runtime.Context");
+            Method functionMethod = functionClass.getMethod(methodName, InputStream.class, OutputStream.class, contextClass);
+            Object function = functionClass.newInstance();
+            ByteArrayInputStream bais = new ByteArrayInputStream(request.getBytes("utf-8"));
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            functionMethod.invoke(function, bais, baos, null);
+            byte[] data = baos.toByteArray();
+            return new String(data, "utf-8");
+        }
+        catch (Exception e)
+        {
+            if (e instanceof IOException)
+                throw (IOException)e;
+            else
+                throw new IOException(e);
+        }
+    }
+    
+    private static String makeHTTPRequest(ApplicationBean app, String request) throws IOException
     {
         byte[] body = request.getBytes("utf-8");
         URL serviceURL = new URL(app.getEndpoint());

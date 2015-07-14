@@ -92,7 +92,7 @@ public class ScriptTransactionPanel extends JPanel
         if ((mTrans.getActualResult() != null) && (mTrans.getActualResult().getOutputText() != null))
         {
             mActualOutputText.setText(mTrans.getActualResult().getOutputText());
-            boolean same = mTrans.getOutputText().equals(mTrans.getActualResult().getOutputText());
+            boolean same = mTrans.getActualResult().getOutputText().equals(mTrans.getOutputText());
             mActualOutputText.setForeground((same == mTrans.isExpectedResult()) ? PASS : FAIL);
             mActualOutputState.setForeground((same == mTrans.isExpectedResult()) ? PASS : FAIL);
             mActualOutputState.setText((same == mTrans.isExpectedResult()) ? "\u2714" : "\u2716");
