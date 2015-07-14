@@ -67,6 +67,7 @@ public class ScriptLogic
     
     public static void doRun(RuntimeBean runtime)
     {
+        runtime.setScriptRunning(true);
         RuntimeLogic.clearHistory(runtime);
         TransactionBean trans;
         long lastUpdate = System.currentTimeMillis();
@@ -86,6 +87,7 @@ public class ScriptLogic
                 lastUpdate = now;
             }
         }
+        runtime.setScriptRunning(false);
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
 
@@ -225,6 +227,21 @@ public class ScriptLogic
             default:
                 throw new IllegalArgumentException("Unexpected match mode: "+script.getMatchMode());
         }
+    }
+    
+    public static Boolean pass(List<ScriptTransactionBean> script)
+    {
+        Boolean result = null;
+        for (ScriptTransactionBean s : script)
+        {
+            Boolean r = pass(s);
+            if (r == null)
+                continue;
+            if (r == Boolean.FALSE)
+                return Boolean.FALSE;
+            result = true;
+        }
+        return result;
     }
 
     public static void setExpected(RuntimeBean runtime,

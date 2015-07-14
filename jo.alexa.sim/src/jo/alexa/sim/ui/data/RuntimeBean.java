@@ -14,6 +14,7 @@ public class RuntimeBean extends PCSBean
     private List<ScriptTransactionBean>   mScript;
     private TransactionRenderOpsBean    mRenderOps;
     private List<AppSpecBean> mMRUs;
+    private boolean             mScriptRunning;
 
     public RuntimeBean()
     {
@@ -21,6 +22,7 @@ public class RuntimeBean extends PCSBean
         mHistory = new ArrayList<TransactionBean>();
         mRenderOps = new TransactionRenderOpsBean();
         mScript = new ArrayList<ScriptTransactionBean>();
+        mScriptRunning = false;
     }
     
     public ApplicationBean getApp()
@@ -85,5 +87,17 @@ public class RuntimeBean extends PCSBean
     public void setScript(List<ScriptTransactionBean> script)
     {
         mScript = script;
+    }
+
+    public boolean isScriptRunning()
+    {
+        return mScriptRunning;
+    }
+
+    public void setScriptRunning(boolean scriptRunning)
+    {
+        boolean _ScriptRunning = mScriptRunning;
+        mScriptRunning = scriptRunning;
+        mPCS.firePropertyChange("scriptRunning", _ScriptRunning, mScriptRunning);
     }
 }

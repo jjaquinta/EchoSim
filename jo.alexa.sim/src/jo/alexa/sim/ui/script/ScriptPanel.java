@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -33,6 +35,8 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
  
     private RuntimeBean mRuntime;
     
+    // status
+    private JLabel      mStatus;
     // commands
     private JButton     mRun;
     private JButton     mInsertHistory;
@@ -59,6 +63,8 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
 
     private void initInstantiate()
     {
+        // status
+        mStatus = new JLabel();
         // commands
         mRun = new JButton("Run");
         mRun.setToolTipText("Run current script");
@@ -93,8 +99,12 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
     {
         setLayout(new BorderLayout());
         add("Center", new JScrollPane(mScript));
+        JPanel topBar = new JPanel();
+        topBar.setLayout(new GridLayout(2, 1));
+        topBar.add(mStatus);
         JPanel commandBar = new JPanel();
-        add("North", commandBar);
+        topBar.add(commandBar);
+        add("North", topBar);
         commandBar.setLayout(new FlowLayout());
         commandBar.add(mRun);
         commandBar.add(mInsertHistory);
@@ -312,6 +322,18 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
     @Override
     public void propertyChange(PropertyChangeEvent evt)
     {
+        if (mRuntime.isScriptRunning())
+            mStatus.setText("Script running...");
+        else
+        {
+            Boolean result = ScriptLogic.pass(mRuntime.getScript());
+            if (result == null)
+                mStatus.setText("Indeterminate script result");
+            else if (result)
+                mStatus.setText("Script passed");
+            else
+                mStatus.setText("Script failed");
+        }
     }
     
     private Frame getFrame()
