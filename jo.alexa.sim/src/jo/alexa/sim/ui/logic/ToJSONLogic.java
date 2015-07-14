@@ -52,7 +52,7 @@ public class ToJSONLogic
     public static JSONObject toJSONScriptTransaction(ScriptTransactionBean trans)
     {
         JSONObject jtrans = toJSONTransaction(trans);
-        jtrans.put("ExpectedResult", trans.isExpectedResult());
+        jtrans.put("MatchMode", trans.getMatchMode());
         jtrans.put("ActualResult", toJSONTransaction(trans.getActualResult()));
         return jtrans;
     }

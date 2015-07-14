@@ -77,7 +77,10 @@ public class FromJSONLogic
     public static ScriptTransactionBean fromJSONScriptTransaction(ScriptTransactionBean trans, JSONObject jtrans, ApplicationBean context)
     {
         fromJSONTransaction(trans, jtrans, context);
-        trans.setExpectedResult((Boolean)jtrans.get("ExpectedResult"));
+        if (jtrans.containsKey("ExpectedResult"))
+            trans.setMatchMode((Boolean)jtrans.get("ExpectedResult") ? ScriptTransactionBean.MODE_MUST_MATCH : ScriptTransactionBean.MODE_CANT_MATCH);
+        else if (jtrans.containsKey("MatchMode"))
+            trans.setMatchMode(((Number)jtrans.get("MatchMode")).intValue());
         trans.setActualResult(fromJSONTransaction(new TransactionBean(), (JSONObject)jtrans.get("ActualResult"), context));
         return trans;
     }

@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
@@ -123,7 +124,10 @@ public class ScriptLogic
             List<ScriptTransactionBean> sel)
     {
         for (ScriptTransactionBean trans : sel)
-            trans.setExpectedResult(!trans.isExpectedResult());
+            if (trans.getMatchMode() == ScriptTransactionBean.MODE_CANT_REGEX)
+                trans.setMatchMode(ScriptTransactionBean.MODE_MUST_MATCH);
+            else
+                trans.setMatchMode(trans.getMatchMode() + 1);
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
 
@@ -194,5 +198,39 @@ public class ScriptLogic
         if (start >= 0)
             intervals.add(new int[] { start, end });
         return intervals;
+    }
+    
+    public static Boolean pass(ScriptTransactionBean script)
+    {
+        if (script.getActualResult() == null)
+            return null;
+        String actual = script.getActualResult().getOutputText();
+        if (actual == null)
+            return null;
+        String expected = script.getOutputText();
+        if (expected == null)
+            return null;
+        switch (script.getMatchMode())
+        {
+            case ScriptTransactionBean.MODE_MUST_MATCH:
+                return actual.equalsIgnoreCase(expected);
+            case ScriptTransactionBean.MODE_CANT_MATCH:
+                return !actual.equalsIgnoreCase(expected);
+            case ScriptTransactionBean.MODE_DONT_CARE:
+                return null;
+            case ScriptTransactionBean.MODE_MUST_REGEX:
+                return Pattern.matches(expected, actual);
+            case ScriptTransactionBean.MODE_CANT_REGEX:
+                return !Pattern.matches(expected, actual);
+            default:
+                throw new IllegalArgumentException("Unexpected match mode: "+script.getMatchMode());
+        }
+    }
+
+    public static void setExpected(RuntimeBean runtime,
+            ScriptTransactionBean script, String newValue)
+    {
+        script.setOutputText(newValue);       
+        runtime.firePropertyChange("script", null, runtime.getScript());
     }
 }

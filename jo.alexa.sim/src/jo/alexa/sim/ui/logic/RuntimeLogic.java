@@ -120,7 +120,7 @@ public class RuntimeLogic
     {
         runtime.getApp().setUserID(UserID);
         runtime.firePropertyChange("app", null, runtime.getApp());
-        setProp("app.endpoint", runtime.getApp().getUserID());
+        setProp("app.userID", runtime.getApp().getUserID());
     }
     public static void readIntents(RuntimeBean runtime, URI source) throws IOException
     {

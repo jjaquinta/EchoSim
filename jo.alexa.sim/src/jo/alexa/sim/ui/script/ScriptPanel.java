@@ -43,6 +43,7 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
     private JButton     mDelete;
     private JButton     mMoveUp;
     private JButton     mMoveDown;
+    private JButton     mEditExpected;
     private JButton     mToggleExpectation;
     private JButton     mUpdateExpected;
     private JButton     mClearResults;
@@ -76,8 +77,10 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
         mMoveUp.setToolTipText("Move selected lines up");
         mMoveDown = new JButton("\u2193");
         mMoveDown.setToolTipText("Move selected lines down");
+        mEditExpected = new JButton("Edit");
+        mEditExpected.setToolTipText("Edit expected text");
         mToggleExpectation = new JButton("Toggle");
-        mToggleExpectation.setToolTipText("Toggle if expected text is pass or fail");
+        mToggleExpectation.setToolTipText("Toggle if expected text is pass/fail/don't care");
         mUpdateExpected = new JButton("Update");
         mUpdateExpected.setToolTipText("Update expected with actual");
         mClearResults = new JButton("Clear Results");
@@ -104,6 +107,7 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
         editBar.add(mDelete);
         editBar.add(mMoveUp);
         editBar.add(mMoveDown);
+        editBar.add(mEditExpected);
         editBar.add(mToggleExpectation);
         editBar.add(mUpdateExpected);
         commandBar.add(mClearResults);
@@ -165,6 +169,13 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
             public void actionPerformed(ActionEvent e)
             {
                 doToggleExpectation();
+            }
+        });
+        mEditExpected.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                doEditExpected();
             }
         });
         mUpdateExpected.addActionListener(new ActionListener() {
@@ -265,6 +276,15 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
     {
         List<ScriptTransactionBean> sel = mScript.getSelectedValuesList();
         ScriptLogic.deleteLines(mRuntime, sel);
+    }
+    
+    private void doEditExpected()
+    {
+        ScriptTransactionBean sel = mScript.getSelectedValue();
+        String newValue = (String)JOptionPane.showInputDialog(this, "Enter in expected value", "Expected Value", 
+                JOptionPane.QUESTION_MESSAGE, null, null, sel.getOutputText());
+        if (newValue != null)
+            ScriptLogic.setExpected(mRuntime, sel, newValue);
     }
     
     private void doToggleExpectation()

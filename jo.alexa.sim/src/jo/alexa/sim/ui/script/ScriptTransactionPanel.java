@@ -10,6 +10,7 @@ import javax.swing.border.MatteBorder;
 
 import jo.alexa.sim.logic.RequestLogic;
 import jo.alexa.sim.ui.data.ScriptTransactionBean;
+import jo.alexa.sim.ui.logic.ScriptLogic;
 
 public class ScriptTransactionPanel extends JPanel
 {
@@ -90,22 +91,54 @@ public class ScriptTransactionPanel extends JPanel
         mExpectedOutputText.setText(mTrans.getOutputText());
         updateExpectedResult();
         if ((mTrans.getActualResult() != null) && (mTrans.getActualResult().getOutputText() != null))
-        {
             mActualOutputText.setText(mTrans.getActualResult().getOutputText());
-            boolean same = mTrans.getActualResult().getOutputText().equals(mTrans.getOutputText());
-            mActualOutputText.setForeground((same == mTrans.isExpectedResult()) ? PASS : FAIL);
-            mActualOutputState.setForeground((same == mTrans.isExpectedResult()) ? PASS : FAIL);
-            mActualOutputState.setText((same == mTrans.isExpectedResult()) ? "\u2714" : "\u2716");
-        }
         else
             mActualOutputText.setText("");
+        Boolean same = ScriptLogic.pass(mTrans);
+        if (same == null)
+        {
+            mActualOutputText.setForeground(null);
+            mActualOutputState.setForeground(null);
+            mActualOutputState.setText("-");
+        }
+        else
+        {
+            mActualOutputText.setForeground(same ? PASS : FAIL);
+            mActualOutputState.setForeground(same ? PASS : FAIL);
+            mActualOutputState.setText(same ? "\u2714" : "\u2716");
+        }
     }
 
     private void updateExpectedResult()
     {
-        mExpectedOutputText.setForeground(mTrans.isExpectedResult() ? PASS : FAIL);
-        mExpectedOutputMode.setText(mTrans.isExpectedResult() ? "\u2714" : "\u2716");
-        mExpectedOutputMode.setForeground(mTrans.isExpectedResult() ? PASS : FAIL);
+        switch (mTrans.getMatchMode())
+        {
+            case ScriptTransactionBean.MODE_MUST_MATCH:
+                mExpectedOutputText.setForeground(PASS);
+                mExpectedOutputMode.setText("\u2714");
+                mExpectedOutputMode.setForeground(PASS);
+                break;
+            case ScriptTransactionBean.MODE_CANT_MATCH:
+                mExpectedOutputText.setForeground(FAIL);
+                mExpectedOutputMode.setText("\u2716");
+                mExpectedOutputMode.setForeground(FAIL);
+                break;
+            case ScriptTransactionBean.MODE_DONT_CARE:
+                mExpectedOutputText.setForeground(null);
+                mExpectedOutputMode.setText("-");
+                mExpectedOutputMode.setForeground(null);
+                break;
+            case ScriptTransactionBean.MODE_MUST_REGEX:
+                mExpectedOutputText.setForeground(PASS);
+                mExpectedOutputMode.setText("\u211e\u2714");
+                mExpectedOutputMode.setForeground(PASS);
+                break;
+            case ScriptTransactionBean.MODE_CANT_REGEX:
+                mExpectedOutputText.setForeground(FAIL);
+                mExpectedOutputMode.setText("\u211e\u2716");
+                mExpectedOutputMode.setForeground(FAIL);
+                break;
+        }
     }
 
     public int getIndex()
