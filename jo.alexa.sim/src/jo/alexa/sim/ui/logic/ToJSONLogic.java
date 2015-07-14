@@ -1,6 +1,7 @@
 package jo.alexa.sim.ui.logic;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -12,6 +13,8 @@ import jo.alexa.sim.data.ResponseBean;
 import jo.alexa.sim.data.SlotBean;
 import jo.alexa.sim.ui.data.AppSpecBean;
 import jo.alexa.sim.ui.data.ScriptTransactionBean;
+import jo.alexa.sim.ui.data.TestCaseBean;
+import jo.alexa.sim.ui.data.TestSuiteBean;
 import jo.alexa.sim.ui.data.TransactionBean;
 
 import org.json.simple.JSONArray;
@@ -38,6 +41,36 @@ public class ToJSONLogic
         jspec.put("IntentURI", spec.getIntentURI());
         jspec.put("UtteranceURI", spec.getUtteranceURI());
         return jspec;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static JSONObject toJSONTestSuite(TestSuiteBean testcase)
+    {
+        JSONObject suite = new JSONObject();
+        suite.put("Name", testcase.getName());
+        JSONArray cases = new JSONArray();
+        suite.put("CaseFiles", cases);
+        for (File casa : testcase.getCaseFiles())
+            cases.add(getRelativePath(testcase.getFile(), casa));
+        return suite;
+    }
+
+    private static String getRelativePath(File parent, File child)
+    {
+        String childName = child.toString();
+        String parentName = parent.getParent();
+        if (childName.startsWith(parentName))
+            return "$"+childName.substring(parentName.length());
+        else
+            return childName;
+    }
+    
+    public static JSONObject toJSONTestCase(TestCaseBean testcase)
+    {
+        JSONObject jtestcase = new JSONObject();
+        jtestcase.put("Name", testcase.getName());
+        jtestcase.put("Script", toJSONScriptTransactions(testcase.getScript()));
+        return jtestcase;
     }
     
     @SuppressWarnings("unchecked")

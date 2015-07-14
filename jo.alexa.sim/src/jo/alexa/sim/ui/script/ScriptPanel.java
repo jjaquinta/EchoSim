@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FileDialog;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -36,6 +37,7 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
     private RuntimeBean mRuntime;
     
     // status
+    private JLabel      mName;
     private JLabel      mStatus;
     // commands
     private JButton     mRun;
@@ -47,6 +49,7 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
     private JButton     mDelete;
     private JButton     mMoveUp;
     private JButton     mMoveDown;
+    private JButton     mRename;
     private JButton     mEditExpected;
     private JButton     mToggleExpectation;
     private JButton     mUpdateExpected;
@@ -64,6 +67,8 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
     private void initInstantiate()
     {
         // status
+        mName = new JLabel();
+        mName.setFont(mName.getFont().deriveFont(Font.BOLD));
         mStatus = new JLabel();
         // commands
         mRun = new JButton("Run");
@@ -83,6 +88,8 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
         mMoveUp.setToolTipText("Move selected lines up");
         mMoveDown = new JButton("\u2193");
         mMoveDown.setToolTipText("Move selected lines down");
+        mRename = new JButton("Rename");
+        mRename.setToolTipText("Rename script");
         mEditExpected = new JButton("Edit");
         mEditExpected.setToolTipText("Edit expected text");
         mToggleExpectation = new JButton("Toggle");
@@ -101,7 +108,11 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
         add("Center", new JScrollPane(mScript));
         JPanel topBar = new JPanel();
         topBar.setLayout(new GridLayout(2, 1));
-        topBar.add(mStatus);
+        JPanel statusLine = new JPanel();
+        topBar.add(statusLine);
+        statusLine.setLayout(new BorderLayout());
+        statusLine.add("Center", mStatus);
+        statusLine.add("West", mName);
         JPanel commandBar = new JPanel();
         topBar.add(commandBar);
         add("North", topBar);
@@ -117,6 +128,7 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
         editBar.add(mDelete);
         editBar.add(mMoveUp);
         editBar.add(mMoveDown);
+        editBar.add(mRename);
         editBar.add(mEditExpected);
         editBar.add(mToggleExpectation);
         editBar.add(mUpdateExpected);
@@ -186,6 +198,13 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
             public void actionPerformed(ActionEvent e)
             {
                 doEditExpected();
+            }
+        });
+        mRename.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                doRename();
             }
         });
         mUpdateExpected.addActionListener(new ActionListener() {
@@ -288,6 +307,14 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
         ScriptLogic.deleteLines(mRuntime, sel);
     }
     
+    private void doRename()
+    {
+        String newValue = (String)JOptionPane.showInputDialog(this, "Enter in new script name", "Script Name", 
+                JOptionPane.QUESTION_MESSAGE, null, null, mRuntime.getScript().getName());
+        if (newValue != null)
+            ScriptLogic.setScriptName(mRuntime, newValue);
+    }
+    
     private void doEditExpected()
     {
         ScriptTransactionBean sel = mScript.getSelectedValue();
@@ -334,6 +361,7 @@ public class ScriptPanel extends JPanel implements PropertyChangeListener
             else
                 mStatus.setText("Script failed");
         }
+        mName.setText(mRuntime.getScript().getName());
     }
     
     private Frame getFrame()

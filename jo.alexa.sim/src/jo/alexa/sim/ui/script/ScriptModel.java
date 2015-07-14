@@ -26,13 +26,13 @@ public class ScriptModel extends AbstractListModel<ScriptTransactionBean> implem
     @Override
     public int getSize()
     {
-        return mRuntime.getScript().size();
+        return mRuntime.getScript().getScript().size();
     }
 
     @Override
     public ScriptTransactionBean getElementAt(int index)
     {
-        return mRuntime.getScript().get(index);
+        return mRuntime.getScript().getScript().get(index);
     }
 
     @Override

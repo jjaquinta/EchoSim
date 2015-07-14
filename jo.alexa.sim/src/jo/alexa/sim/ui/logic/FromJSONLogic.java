@@ -2,6 +2,7 @@ package jo.alexa.sim.ui.logic;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ import jo.alexa.sim.data.ResponseBean;
 import jo.alexa.sim.data.SlotBean;
 import jo.alexa.sim.ui.data.AppSpecBean;
 import jo.alexa.sim.ui.data.ScriptTransactionBean;
+import jo.alexa.sim.ui.data.TestCaseBean;
+import jo.alexa.sim.ui.data.TestSuiteBean;
 import jo.alexa.sim.ui.data.TransactionBean;
 
 import org.json.simple.JSONArray;
@@ -64,6 +67,45 @@ public class FromJSONLogic
         trans.setOutputData(fromJSON((JSONObject)jtrans.get("OutputData")));
         trans.setError((Throwable)fromJSON((String)jtrans.get("Error")));
         return trans;
+    }
+    
+    public static TestSuiteBean fronJSONTestSuite(JSONObject jtestsuite, File base)
+    {
+        TestSuiteBean testsuite = new TestSuiteBean();
+        testsuite.setName((String)jtestsuite.get("Name"));
+        JSONArray jcases = (JSONArray)jtestsuite.get("CaseFiles");
+        for (Object ocase : jcases)
+        {
+            String jcase = (String)ocase;
+            File casa = new File(jcase);
+            if (casa.exists())
+                testsuite.getCaseFiles().add(casa);
+            else
+            {
+                casa = new File(base.getParent() + jcase);
+                if (casa.exists())
+                    testsuite.getCaseFiles().add(casa);
+                else
+                    System.err.println("Cannot find "+jcase+" (w.r.t. "+base+")");
+            }
+        }
+        return testsuite;
+    }
+    
+    public static TestCaseBean fromJSONTestCase(Object tc, ApplicationBean context)
+    {
+        TestCaseBean testCase = new TestCaseBean();
+        if (tc instanceof JSONArray)
+        {
+            testCase.setScript(fromJSONScriptTransactions((JSONArray)tc, context));
+        }
+        else
+        {
+            JSONObject jtestcase = (JSONObject)tc;
+            testCase.setName((String)jtestcase.get("Name"));
+            testCase.setScript(fromJSONScriptTransactions((JSONArray)jtestcase.get("Script"), context));
+        }
+        return testCase;
     }
     
     public static List<ScriptTransactionBean> fromJSONScriptTransactions(JSONArray jtranss, ApplicationBean context)

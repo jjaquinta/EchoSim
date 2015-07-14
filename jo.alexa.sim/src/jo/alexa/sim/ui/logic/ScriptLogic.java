@@ -15,23 +15,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.json.simple.JSONArray;
-import org.json.simple.parser.ParseException;
-
 import jo.alexa.sim.logic.RequestLogic;
 import jo.alexa.sim.ui.data.RuntimeBean;
 import jo.alexa.sim.ui.data.ScriptTransactionBean;
+import jo.alexa.sim.ui.data.TestCaseBean;
+import jo.alexa.sim.ui.data.TestSuiteBean;
 import jo.alexa.sim.ui.data.TransactionBean;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 public class ScriptLogic
 {
     public static void loadHistory(RuntimeBean runtime)
     {
-        runtime.getScript().clear();
+        runtime.getScript().getScript().clear();
         for (TransactionBean trans : runtime.getHistory())
         {
             ScriptTransactionBean strans = new ScriptTransactionBean(trans);
-            runtime.getScript().add(strans);
+            runtime.getScript().getScript().add(strans);
         }
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
@@ -41,20 +43,20 @@ public class ScriptLogic
         for (TransactionBean trans : runtime.getHistory())
         {
             ScriptTransactionBean strans = new ScriptTransactionBean(trans);
-            runtime.getScript().add(position++, strans);
+            runtime.getScript().getScript().add(position++, strans);
         }
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
 
     public static void clearScript(RuntimeBean runtime)
     {
-        runtime.getScript().clear();
+        runtime.getScript().getScript().clear();
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
 
     public static void clearResults(RuntimeBean runtime)
     {
-        for (ScriptTransactionBean trans : runtime.getScript())
+        for (ScriptTransactionBean trans : runtime.getScript().getScript())
             trans.setActualResult(null);
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
@@ -71,7 +73,7 @@ public class ScriptLogic
         RuntimeLogic.clearHistory(runtime);
         TransactionBean trans;
         long lastUpdate = System.currentTimeMillis();
-        for (ScriptTransactionBean script : runtime.getScript())
+        for (ScriptTransactionBean script : runtime.getScript().getScript())
         {
             if (script.getRequestType().equals(RequestLogic.LAUNCH_REQUEST))
                 trans = RuntimeLogic.startSession(runtime);
@@ -95,29 +97,29 @@ public class ScriptLogic
     {
         InputStream is = new FileInputStream(source);
         Reader rdr = new InputStreamReader(is, "utf-8");
-        JSONArray jtranss;
+        Object jtestcase;
         try
         {
-            jtranss = (JSONArray)(RuntimeLogic.mParser.parse(rdr));
+            jtestcase = RuntimeLogic.mParser.parse(rdr);
         }
         catch (ParseException e)
         {
             throw new IOException(e);
         }
         rdr.close();
-        List<ScriptTransactionBean> transs = FromJSONLogic.fromJSONScriptTransactions(jtranss, runtime.getApp());
-        runtime.getScript().clear();
-        runtime.getScript().addAll(transs);
+        TestCaseBean casa = FromJSONLogic.fromJSONTestCase(jtestcase, runtime.getApp());
+        casa.setFile(source);
+        runtime.setScript(casa);
         runtime.firePropertyChange("script", null, runtime.getScript());
         RuntimeLogic.setProp("app.script", source.toString());
     }
 
     public static void saveScript(RuntimeBean runtime, File source) throws IOException
     {
-        JSONArray transs = ToJSONLogic.toJSONScriptTransactions(runtime.getScript());
+        JSONObject testcase = ToJSONLogic.toJSONTestCase(runtime.getScript());
         OutputStream os = new FileOutputStream(source);
         Writer wtr = new OutputStreamWriter(os, "utf-8");
-        wtr.write(transs.toJSONString());
+        wtr.write(testcase.toJSONString());
         wtr.close();
         RuntimeLogic.setProp("app.script", source.toString());
     }
@@ -136,7 +138,7 @@ public class ScriptLogic
     public static void deleteLines(RuntimeBean runtime,
             List<ScriptTransactionBean> sel)
     {
-        runtime.getScript().removeAll(sel);
+        runtime.getScript().getScript().removeAll(sel);
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
 
@@ -155,9 +157,9 @@ public class ScriptLogic
         for (int[] interval : intervals)
             if (interval[0] > 0)
             {
-                ScriptTransactionBean trans = runtime.getScript().get(interval[0] - 1);
-                runtime.getScript().remove(interval[0] - 1);
-                runtime.getScript().add(interval[1], trans);
+                ScriptTransactionBean trans = runtime.getScript().getScript().get(interval[0] - 1);
+                runtime.getScript().getScript().remove(interval[0] - 1);
+                runtime.getScript().getScript().add(interval[1], trans);
             }
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
@@ -166,11 +168,11 @@ public class ScriptLogic
     {
         List<int[]> intervals = makeIntervals(selectedIndices);
         for (int[] interval : intervals)
-            if (interval[1] < runtime.getScript().size() - 1)
+            if (interval[1] < runtime.getScript().getScript().size() - 1)
             {
-                ScriptTransactionBean trans = runtime.getScript().get(interval[1] + 1);
-                runtime.getScript().remove(interval[1] + 1);
-                runtime.getScript().add(interval[0], trans);
+                ScriptTransactionBean trans = runtime.getScript().getScript().get(interval[1] + 1);
+                runtime.getScript().getScript().remove(interval[1] + 1);
+                runtime.getScript().getScript().add(interval[0], trans);
             }
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
@@ -229,12 +231,29 @@ public class ScriptLogic
         }
     }
     
-    public static Boolean pass(List<ScriptTransactionBean> script)
+    public static Boolean pass(TestCaseBean casa)
     {
+        if (casa == null)
+            return null;
         Boolean result = null;
-        for (ScriptTransactionBean s : script)
+        for (ScriptTransactionBean s : casa.getScript())
         {
             Boolean r = pass(s);
+            if (r == null)
+                continue;
+            if (r == Boolean.FALSE)
+                return Boolean.FALSE;
+            result = true;
+        }
+        return result;
+    }
+    
+    public static Boolean pass(TestSuiteBean suite)
+    {
+        Boolean result = null;
+        for (TestCaseBean casa : suite.getCases())
+        {
+            Boolean r = pass(casa);
             if (r == null)
                 continue;
             if (r == Boolean.FALSE)
@@ -248,6 +267,12 @@ public class ScriptLogic
             ScriptTransactionBean script, String newValue)
     {
         script.setOutputText(newValue);       
+        runtime.firePropertyChange("script", null, runtime.getScript());
+    }
+
+    public static void setScriptName(RuntimeBean runtime, String newValue)
+    {
+        runtime.getScript().setName(newValue);
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
 }

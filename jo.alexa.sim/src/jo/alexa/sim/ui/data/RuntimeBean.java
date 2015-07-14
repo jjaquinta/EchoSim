@@ -11,7 +11,7 @@ public class RuntimeBean extends PCSBean
     private boolean         mDisclaimerAccepted;
     private ApplicationBean mApp;
     private List<TransactionBean>   mHistory;
-    private List<ScriptTransactionBean>   mScript;
+    private TestCaseBean    mScript;
     private TransactionRenderOpsBean    mRenderOps;
     private List<AppSpecBean> mMRUs;
     private boolean             mScriptRunning;
@@ -21,7 +21,7 @@ public class RuntimeBean extends PCSBean
         mApp = new ApplicationBean();
         mHistory = new ArrayList<TransactionBean>();
         mRenderOps = new TransactionRenderOpsBean();
-        mScript = new ArrayList<ScriptTransactionBean>();
+        mScript = new TestCaseBean();
         mScriptRunning = false;
     }
     
@@ -79,12 +79,12 @@ public class RuntimeBean extends PCSBean
         mMRUs = mRUs;
     }
 
-    public List<ScriptTransactionBean> getScript()
+    public TestCaseBean getScript()
     {
         return mScript;
     }
 
-    public void setScript(List<ScriptTransactionBean> script)
+    public void setScript(TestCaseBean script)
     {
         mScript = script;
     }
