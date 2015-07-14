@@ -9,6 +9,7 @@ import jo.alexa.sim.ui.app.ApplicationPanel;
 import jo.alexa.sim.ui.data.RuntimeBean;
 import jo.alexa.sim.ui.man.ManualScriptPanel;
 import jo.alexa.sim.ui.script.ScriptPanel;
+import jo.alexa.sim.ui.suite.SuitePanel;
 import jo.alexa.sim.ui.test.TestingPanel;
 
 public class MainPanel extends JPanel
@@ -24,6 +25,7 @@ public class MainPanel extends JPanel
     private ApplicationPanel    mApp;
     private TestingPanel        mTester;
     private ScriptPanel         mAutoScript;
+    private SuitePanel          mTestSuite;
     private ManualScriptPanel   mManScript;
     
     public MainPanel(RuntimeBean runtime)
@@ -40,6 +42,7 @@ public class MainPanel extends JPanel
         mManScript = new ManualScriptPanel(mRuntime);
         mTester = new TestingPanel(mRuntime);
         mAutoScript = new ScriptPanel(mRuntime);
+        mTestSuite = new SuitePanel(mRuntime);
     }
 
     private void initLayout()
@@ -48,6 +51,7 @@ public class MainPanel extends JPanel
         tabs.add("App", mApp);
         tabs.add("Tester", mTester);
         tabs.add("Script", mAutoScript);
+        tabs.add("Suite", mTestSuite);
         tabs.add("Manual", mManScript);
         setLayout(new BorderLayout());
         add("Center", tabs);

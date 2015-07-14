@@ -2,6 +2,7 @@ package jo.alexa.sim.ui.logic;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +21,6 @@ import jo.alexa.sim.logic.RequestLogic;
 import jo.alexa.sim.ui.data.RuntimeBean;
 import jo.alexa.sim.ui.data.ScriptTransactionBean;
 import jo.alexa.sim.ui.data.TestCaseBean;
-import jo.alexa.sim.ui.data.TestSuiteBean;
 import jo.alexa.sim.ui.data.TransactionBean;
 
 import org.json.simple.JSONObject;
@@ -61,15 +62,21 @@ public class ScriptLogic
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
 
+    public static void clearResults(TestCaseBean casa)
+    {
+        for (ScriptTransactionBean trans : casa.getScript())
+            trans.setActualResult(null);
+    }
+
     public static void run(final RuntimeBean runtime)
     {
+        runtime.setScriptRunning(true);
         Thread t = new Thread("Script Run") { public void run() { doRun(runtime); } };
         t.start();
     }
     
     public static void doRun(RuntimeBean runtime)
     {
-        runtime.setScriptRunning(true);
         RuntimeLogic.clearHistory(runtime);
         TransactionBean trans;
         long lastUpdate = System.currentTimeMillis();
@@ -95,6 +102,16 @@ public class ScriptLogic
 
     public static void load(RuntimeBean runtime, File source) throws IOException
     {
+        TestCaseBean casa = doLoad(runtime, source);
+        runtime.setScript(casa);
+        runtime.firePropertyChange("script", null, runtime.getScript());
+        RuntimeLogic.setProp("app.script", source.toString());
+    }
+
+    static TestCaseBean doLoad(RuntimeBean runtime, File source)
+            throws FileNotFoundException, UnsupportedEncodingException,
+            IOException
+    {
         InputStream is = new FileInputStream(source);
         Reader rdr = new InputStreamReader(is, "utf-8");
         Object jtestcase;
@@ -109,9 +126,7 @@ public class ScriptLogic
         rdr.close();
         TestCaseBean casa = FromJSONLogic.fromJSONTestCase(jtestcase, runtime.getApp());
         casa.setFile(source);
-        runtime.setScript(casa);
-        runtime.firePropertyChange("script", null, runtime.getScript());
-        RuntimeLogic.setProp("app.script", source.toString());
+        return casa;
     }
 
     public static void saveScript(RuntimeBean runtime, File source) throws IOException
@@ -177,7 +192,7 @@ public class ScriptLogic
         runtime.firePropertyChange("script", null, runtime.getScript());
     }
 
-    private static List<int[]> makeIntervals(int[] selectedIndices)
+    static List<int[]> makeIntervals(int[] selectedIndices)
     {
         Arrays.sort(selectedIndices);
         List<int[]> intervals = new ArrayList<int[]>();
@@ -239,21 +254,6 @@ public class ScriptLogic
         for (ScriptTransactionBean s : casa.getScript())
         {
             Boolean r = pass(s);
-            if (r == null)
-                continue;
-            if (r == Boolean.FALSE)
-                return Boolean.FALSE;
-            result = true;
-        }
-        return result;
-    }
-    
-    public static Boolean pass(TestSuiteBean suite)
-    {
-        Boolean result = null;
-        for (TestCaseBean casa : suite.getCases())
-        {
-            Boolean r = pass(casa);
             if (r == null)
                 continue;
             if (r == Boolean.FALSE)

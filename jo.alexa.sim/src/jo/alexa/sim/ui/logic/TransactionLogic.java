@@ -64,10 +64,13 @@ public class TransactionLogic
             Date d = new Date(trans.getTransactionEnd());
             long e = trans.getTransactionEnd() - trans.getTransactionStart();
             html.append("<small>"+d+", "+e+"ms</small> ");
-            if (trans.getOutputData().getOutputSpeechType() != null)
-                html.append("<small>output type="+trans.getOutputData().getOutputSpeechType()+"</small> ");
-            if (trans.getOutputData().getRepromptType() != null)
-                html.append("<small>reprompt type="+trans.getOutputData().getRepromptType()+"</small> ");
+            if (trans.getOutputData() != null)
+            {
+                if (trans.getOutputData().getOutputSpeechType() != null)
+                    html.append("<small>output type="+trans.getOutputData().getOutputSpeechType()+"</small> ");
+                if (trans.getOutputData().getRepromptType() != null)
+                    html.append("<small>reprompt type="+trans.getOutputData().getRepromptType()+"</small> ");
+            }
         }
         html.append("</td>");
         if (ops.isCards())

@@ -15,6 +15,8 @@ public class RuntimeBean extends PCSBean
     private TransactionRenderOpsBean    mRenderOps;
     private List<AppSpecBean> mMRUs;
     private boolean             mScriptRunning;
+    private TestSuiteBean       mSuite;
+    private boolean             mSuiteRunning;
 
     public RuntimeBean()
     {
@@ -23,6 +25,8 @@ public class RuntimeBean extends PCSBean
         mRenderOps = new TransactionRenderOpsBean();
         mScript = new TestCaseBean();
         mScriptRunning = false;
+        mSuite = new TestSuiteBean();
+        mSuiteRunning = false;
     }
     
     public ApplicationBean getApp()
@@ -99,5 +103,27 @@ public class RuntimeBean extends PCSBean
         boolean _ScriptRunning = mScriptRunning;
         mScriptRunning = scriptRunning;
         mPCS.firePropertyChange("scriptRunning", _ScriptRunning, mScriptRunning);
+    }
+
+    public TestSuiteBean getSuite()
+    {
+        return mSuite;
+    }
+
+    public void setSuite(TestSuiteBean suite)
+    {
+        mSuite = suite;
+    }
+
+    public boolean isSuiteRunning()
+    {
+        return mSuiteRunning;
+    }
+
+    public void setSuiteRunning(boolean suiteRunning)
+    {
+        boolean _SuiteRunning = mSuiteRunning;
+        mSuiteRunning = suiteRunning;
+        mPCS.firePropertyChange("suiteRunning", _SuiteRunning, mSuiteRunning);
     }
 }

@@ -69,7 +69,7 @@ public class FromJSONLogic
         return trans;
     }
     
-    public static TestSuiteBean fronJSONTestSuite(JSONObject jtestsuite, File base)
+    public static TestSuiteBean fromJSONTestSuite(JSONObject jtestsuite, File base)
     {
         TestSuiteBean testsuite = new TestSuiteBean();
         testsuite.setName((String)jtestsuite.get("Name"));
@@ -77,17 +77,15 @@ public class FromJSONLogic
         for (Object ocase : jcases)
         {
             String jcase = (String)ocase;
-            File casa = new File(jcase);
+            File casa;
+            if (jcase.startsWith("$"))
+                casa = new File(base.getParent() + jcase.substring(1));
+            else
+                casa = new File(jcase);
             if (casa.exists())
                 testsuite.getCaseFiles().add(casa);
             else
-            {
-                casa = new File(base.getParent() + jcase);
-                if (casa.exists())
-                    testsuite.getCaseFiles().add(casa);
-                else
-                    System.err.println("Cannot find "+jcase+" (w.r.t. "+base+")");
-            }
+                System.err.println("Cannot find "+jcase+" (w.r.t. "+base+")");
         }
         return testsuite;
     }
