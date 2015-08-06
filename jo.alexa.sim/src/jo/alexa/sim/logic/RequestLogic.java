@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -61,8 +60,8 @@ public class RequestLogic
             int o = app.getEndpoint().indexOf("::");
             String className = app.getEndpoint().substring(0, o);
             String methodName = app.getEndpoint().substring(o + 2);
-            Class<?> functionClass = Class.forName(className);
             Class<?> contextClass = Class.forName("com.amazonaws.services.lambda.runtime.Context");
+            Class<?> functionClass = Class.forName(className);
             Method functionMethod = functionClass.getMethod(methodName, InputStream.class, OutputStream.class, contextClass);
             Object function = functionClass.newInstance();
             ByteArrayInputStream bais = new ByteArrayInputStream(request.getBytes("utf-8"));

@@ -15,6 +15,31 @@ public class MatchBean
     }
     
     @Override
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof MatchBean)
+        {
+            MatchBean m2 = (MatchBean)obj;
+            if (mIntent != m2.getIntent())
+                return false;
+            if (mConfidence != m2.getConfidence())
+                return false;
+            if (mValues.size() != m2.getValues().size())
+                return false;
+            for (SlotBean s1 : mValues.keySet())
+            {
+                if (!m2.getValues().containsKey(s1))
+                    return false;
+                String v2 = m2.getValues().get(s1);
+                if (!mValues.get(s1).equals(v2))
+                    return false;
+            }
+            return true;
+        }
+        return super.equals(obj);
+    }
+    
+    @Override
     public String toString()
     {
         if (mIntent == null)

@@ -6,7 +6,9 @@ import java.io.Reader;
 import java.util.List;
 
 import jo.alexa.sim.data.ApplicationBean;
+import jo.alexa.sim.data.IntentBean;
 import jo.alexa.sim.data.PhraseSegmentBean;
+import jo.alexa.sim.data.SlotBean;
 import jo.alexa.sim.data.SlotSegmentBean;
 import jo.alexa.sim.data.TextSegmentBean;
 import jo.alexa.sim.data.UtteranceBean;
@@ -16,6 +18,9 @@ public class UtteranceLogic
     public static void read(ApplicationBean app, Reader r) throws IOException
     {
         app.getUtterances().clear();
+        for (IntentBean intent : app.getIntentIndex().values())
+            for (SlotBean slot : intent.getSlots())
+                slot.getValues().clear();
         BufferedReader rdr = new BufferedReader(r);
         for (;;)
         {
@@ -59,6 +64,7 @@ public class UtteranceLogic
                 if (slotSeg.getSlot() == null)
                     throw new IllegalArgumentException("Unknown slot '"+slotPhrase.substring(mid + 1)+"'");
                 utterance.getPhrase().add(slotSeg);
+                slotSeg.getSlot().getValues().add(slotSeg.getText());
             }
             else
             {
