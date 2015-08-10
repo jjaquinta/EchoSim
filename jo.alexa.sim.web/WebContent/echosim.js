@@ -20,6 +20,7 @@ function doTalk()
 		url += "&userid="+encodeURI(userid);
 	if (appid != null)
 		url += "&appid="+encodeURI(appid);
+	url += "&Accept=html";
 	xhrGet(url, function(responseText){
 		// add to document
 		var mytitle = document.getElementById('message');

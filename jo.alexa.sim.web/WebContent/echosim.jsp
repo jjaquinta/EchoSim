@@ -28,5 +28,11 @@ appid = <%= request.getParameterMap().containsKey("appid") ? "'"+request.getPara
 	</td>
 </tr>
 </table>
+<!-- getLocalName = <%= request.getLocalAddr() %><br/>
+getRemoteAddr = <%= request.getLocalName() %><br/>
+getRemoteHost = <%= request.getRemoteAddr() %><br/>
+getRemoteUser = <%= request.getRemoteHost() %><br/>
+getRemoteUser = <%= request.getRemoteUser() %><br/>
+getServerName = <%= request.getServerName() %><br/> -->
 </body>
 </html>

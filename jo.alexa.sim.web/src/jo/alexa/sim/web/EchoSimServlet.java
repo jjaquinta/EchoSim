@@ -48,7 +48,7 @@ public class EchoSimServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
 	    JSONObject obj = null;
-		if ("applicaiton/json".equals(request.getContentType()))
+		if ("application/json".equals(request.getContentType()))
 		{
 		    try
             {
@@ -60,9 +60,13 @@ public class EchoSimServlet extends HttpServlet {
 		}
         RequestData data = getRequestData(request, obj);
 		TransactionBean trans = EchoSimLogic.invoke(data);
-		String accept = request.getHeader("Accept");
+		String accept = request.getParameter("Accept");
+		if (accept == null)
+		    accept = request.getHeader("Accept");
 		if ((accept == null) || (accept.indexOf("json") >= 0))
 		    respondJSON(trans, response);
+		else if (accept.indexOf("html") >= 0)
+            respondHTML(trans, response);
 		else
 		    respondText(trans, response);
 	}
@@ -103,6 +107,37 @@ public class EchoSimServlet extends HttpServlet {
         response.getOutputStream().write(outBytes);
     }
 
+    private void respondHTML(TransactionBean trans, HttpServletResponse response) throws IOException
+    {
+        response.setContentType("text/html");
+        StringBuffer html = new StringBuffer();
+        if (trans.getError() != null)
+            html.append("<span color='red'>"+toString(trans.getError())+"</span>");
+        else
+        {
+            if (trans.getOutputText() != null)
+                html.append(trans.getOutputText());
+            if (trans.getOutputData() != null)
+            {
+                if (trans.getOutputData().getRepromptText() != null)
+                {
+                    html.insert(0, "<span title='"+escape(trans.getOutputData().getRepromptText())+"'>");
+                    html.append("</span>");
+                }
+            }
+        }
+        byte[] outBytes = html.toString().getBytes("utf-8");
+        response.setContentLength(outBytes.length);
+        response.getOutputStream().write(outBytes);
+    }
+    
+    private String escape(String txt)
+    {
+        txt = txt.replace("'", "\\'");
+        //txt = txt.replace("\"", "\\\"");
+        return txt;
+    }
+
     private void respondText(TransactionBean trans, HttpServletResponse response) throws IOException
     {
         response.setContentType("text/plain");
@@ -136,7 +171,7 @@ public class EchoSimServlet extends HttpServlet {
         data.setIntents(getDatum(request, obj, "intents", "http://echodevtestenv-65qiix3m3d.elasticbeanstalk.com/jose?fetch=intents"));
         data.setUtterances(getDatum(request, obj, "utterances", "http://echodevtestenv-65qiix3m3d.elasticbeanstalk.com/jose?fetch=utterances"));
         data.setAppID(getDatum(request, obj, "appid", null));
-        data.setUserID(getDatum(request, obj, "userid", request.getSession().getId()));
+        data.setUserID(getDatum(request, obj, "userid", request.getRemoteHost()));
         data.setText(getDatum(request, obj, "text", null));
 	    return data;
 	}
