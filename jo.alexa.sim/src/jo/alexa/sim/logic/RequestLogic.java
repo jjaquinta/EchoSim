@@ -145,7 +145,10 @@ public class RequestLogic
             if (outputSpeech != null)
             {
                 response.setOutputSpeechType((String)outputSpeech.get("type"));
-                response.setOutputSpeechText((String)outputSpeech.get("text"));
+                if ("SSML".equals(response.getOutputSpeechType()))
+                    response.setOutputSpeechText((String)outputSpeech.get("ssml"));
+                else
+                    response.setOutputSpeechText((String)outputSpeech.get("text"));
             }
             JSONObject card = (JSONObject)resp.get("card");
             if (card != null)

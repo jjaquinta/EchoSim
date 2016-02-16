@@ -16,6 +16,7 @@ import jo.alexa.sim.data.SlotSegmentBean;
 import jo.alexa.sim.data.TextSegmentBean;
 import jo.alexa.sim.data.UtteranceBean;
 import jo.alexa.sim.ui.data.TransactionBean;
+import jo.alexa.sim.ui.logic.TransactionLogic;
 
 public class ManualScriptLogic
 {
@@ -81,7 +82,7 @@ public class ManualScriptLogic
             html.append("Expect:");
             TransactionBean expect = findExpected(utterance, history);
             if (expect != null)
-                html.append(expect.getOutputText());
+                html.append(TransactionLogic.renderTextAsHTML(expect.getOutputText()));
             html.append("</li>");
             html.append("</ul>");
         }
