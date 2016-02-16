@@ -11,6 +11,7 @@ public class ApplicationBean extends PCSBean
     private String              mEndpoint;
     private IntentSchemaBean    mSchema;
     private List<UtteranceBean> mUtterances;
+    private Map<String, List<String>> mCustomSlots;
     // derived values
     private Map<String, IntentBean> mIntentIndex;
     private Map<String, SlotBean>   mSlotIndex;
@@ -24,6 +25,7 @@ public class ApplicationBean extends PCSBean
         mSlotIndex = new HashMap<String, SlotBean>();
         mIntentIndex = new HashMap<String, IntentBean>();
         mUtterances = new ArrayList<UtteranceBean>();
+        mCustomSlots = new HashMap<>();
         mSessionID = null;
         mApplicationID = "yourFunkyApplication";
         mUserID = System.getProperty("user.name");
@@ -119,5 +121,15 @@ public class ApplicationBean extends PCSBean
     public void setAttributes(Map<String, Object> attributes)
     {
         mAttributes = attributes;
+    }
+
+    public Map<String, List<String>> getCustomSlots()
+    {
+        return mCustomSlots;
+    }
+
+    public void setCustomSlots(Map<String, List<String>> customSlots)
+    {
+        mCustomSlots = customSlots;
     }
 }

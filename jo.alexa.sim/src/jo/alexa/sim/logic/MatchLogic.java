@@ -146,9 +146,25 @@ public class MatchLogic
             }
             else if (phrase instanceof SlotSegmentBean)
             {
-                segments[i] = indexOf(inbuf, lastMatch, ((SlotSegmentBean)phrase).getText());
-                if (segments[i] != null)
-                    lastMatch = segments[i][1];
+                SlotSegmentBean seg = (SlotSegmentBean)phrase;
+                if (seg.getText() != null)
+                {
+                    segments[i] = indexOf(inbuf, lastMatch, ((SlotSegmentBean)phrase).getText());
+                    if (segments[i] != null)
+                        lastMatch = segments[i][1];
+                }
+                else
+                {
+                    for (String txt : seg.getSlot().getValues())
+                    {
+                        segments[i] = indexOf(inbuf, lastMatch, txt);
+                        if (segments[i] != null)
+                        {
+                            lastMatch = segments[i][1];
+                            break;
+                        }
+                    }
+                }
             }
             else
                 throw new IllegalArgumentException("Unknown phrase "+phrase.getClass().getName());

@@ -8,7 +8,10 @@ public class SlotSegmentBean extends PhraseSegmentBean
     @Override
     public String toString()
     {
-        return "{"+mText+"|"+mSlot.getName()+"}";
+        if (mText == null)
+            return "{"+mSlot.getName()+"}";
+        else
+            return "{"+mText+"|"+mSlot.getName()+"}";
     }
     
     public String getText()

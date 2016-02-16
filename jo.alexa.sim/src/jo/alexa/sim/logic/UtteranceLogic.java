@@ -15,6 +15,29 @@ import jo.alexa.sim.data.UtteranceBean;
 
 public class UtteranceLogic
 {
+    private static final String[] BUILT_IN_UTTERANCES = {
+        "AMAZON.CancelIntent\tcancel",
+        "AMAZON.CancelIntent\tnever mind",
+        "AMAZON.CancelIntent\tforget it",
+        "AMAZON.HelpIntent\thelp",
+        "AMAZON.HelpIntent\thelp me",
+        "AMAZON.HelpIntent\tcan you help me",
+        "AMAZON.NoIntent\tno",
+        "AMAZON.NoIntent\tno thanks",
+        "AMAZON.RepeatIntent\trepeat",
+        "AMAZON.RepeatIntent\tsay that again",
+        "AMAZON.RepeatIntent\trepeat that",
+        "AMAZON.StartOverIntent\tstart over",
+        "AMAZON.StartOverIntent\trestart",
+        "AMAZON.StartOverIntent\tstart again",
+        "AMAZON.StopIntent\tstop",
+        "AMAZON.StopIntent\toff",
+        "AMAZON.StopIntent\tshut up",
+        "AMAZON.YesIntent\tyes",
+        "AMAZON.YesIntent\tyes please",
+        "AMAZON.YesIntent\tsure",
+    };
+    
     public static void read(ApplicationBean app, Reader r) throws IOException
     {
         app.getUtterances().clear();
@@ -29,11 +52,15 @@ public class UtteranceLogic
                 break;
             inbuf = inbuf.trim();
             if (inbuf.length() > 0)
-                parseUtterance(app, inbuf);
+                parseUtterance(app, inbuf, true);
         }
+        rdr.close();
+        // simulate built in utterances
+        for (String inbuf : BUILT_IN_UTTERANCES)
+            parseUtterance(app, inbuf, false);
     }
 
-    private static void parseUtterance(ApplicationBean app, String inbuf)
+    private static void parseUtterance(ApplicationBean app, String inbuf, boolean strict)
     {
         int o = inbuf.indexOf('\t');
         if (o < 0)
@@ -44,7 +71,7 @@ public class UtteranceLogic
         }
         UtteranceBean utterance = new UtteranceBean();
         utterance.setIntent(app.getIntentIndex().get(inbuf.substring(0, o)));
-        if (utterance.getIntent() == null)
+        if ((utterance.getIntent() == null) && strict)
             throw new IllegalArgumentException("Unknown intent '"+inbuf.substring(0, o)+"'");
         inbuf = inbuf.substring(o + 1).trim();
         while (inbuf.length() > 0)
@@ -55,16 +82,23 @@ public class UtteranceLogic
                     throw new IllegalArgumentException("Can't find end of slot '"+inbuf+"'");
                 String slotPhrase = inbuf.substring(1, end);
                 inbuf = inbuf.substring(end + 1).trim();
+                SlotSegmentBean slotSeg = new SlotSegmentBean();
                 int mid = slotPhrase.indexOf('|');
                 if (mid < 0)
-                    throw new IllegalArgumentException("Can't find middle of slot '"+slotPhrase+"'");
-                SlotSegmentBean slotSeg = new SlotSegmentBean();
-                slotSeg.setText(slotPhrase.substring(0, mid).toLowerCase());
-                slotSeg.setSlot(app.getSlotIndex().get(slotPhrase.substring(mid + 1)));
+                {
+                    slotSeg.setText(null);
+                    slotSeg.setSlot(app.getSlotIndex().get(slotPhrase));
+                }
+                else
+                {
+                    slotSeg.setText(slotPhrase.substring(0, mid).toLowerCase());
+                    slotSeg.setSlot(app.getSlotIndex().get(slotPhrase.substring(mid + 1)));
+                }
                 if (slotSeg.getSlot() == null)
                     throw new IllegalArgumentException("Unknown slot '"+slotPhrase.substring(mid + 1)+"'");
                 utterance.getPhrase().add(slotSeg);
-                slotSeg.getSlot().getValues().add(slotSeg.getText());
+                if (slotSeg.getText() != null)
+                    slotSeg.getSlot().getValues().add(slotSeg.getText());
             }
             else
             {

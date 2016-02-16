@@ -90,6 +90,8 @@ public class IntentSchemaLogic
                         throw new IOException("Expected type definition to be a string.");
                     }
                     i.getSlots().add(s);
+                    if (!s.getType().startsWith("AMAZON."))
+                        is.getCustomSlots().add(s.getType());
                 }
                 is.getIntents().add(i);
             }
