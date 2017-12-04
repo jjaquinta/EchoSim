@@ -45,7 +45,7 @@ This lets you group together scripts into a single test suite. Each script will 
 Testing Lambda
 ==============
 
-The simplest way to use EchoSim to test a Lambda function is to create a URL endpoint for your Lambda function using Amazon's Gateway. You can find instructions [here]{http://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started.html}. Once you have a URL endpoint, you can just enter into onto the App Tab as normal.
+The simplest way to use EchoSim to test a Lambda function is to create a URL endpoint for your Lambda function using Amazon's Gateway. You can find instructions [here](http://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started.html). Once you have a URL endpoint, you can just enter into onto the App Tab as normal.
 
 If your Lambda function is in Java, you can use EchoSim to test it directly from the development environment. Pull down
 the EchoSim project from GitHub and create a launch configuration for it. Add to the classpath in the launch configuration
@@ -59,7 +59,7 @@ parameter will be null. You need to make sure you code can handle that condition
 The Book
 ========
 
-There is an e-book [How To Program -- Amazon Echo]{http://www.amazon.com/How-Program-Amazon-Echo-Development-ebook/dp/B011J6AP26}
+There is an e-book [How To Program -- Amazon Echo](http://www.amazon.com/How-Program-Amazon-Echo-Development-ebook/dp/B011J6AP26)
 which contains a whole section on testing Alexa skills, with a lot detail about using EchoSim to do so. It's only $.99 and,
 if these instructions aren't enough, it might be worth investing in.
 
